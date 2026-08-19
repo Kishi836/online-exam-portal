@@ -1,0 +1,39 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+*~
+.vscode/
+.idea/
+
+# OneDrive conflict copies
+*-Conflict*
+*conflicted copy*
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Dependencies / build (stack chosen in Sprint 0)
+node_modules/
+dist/
+build/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+target/
+
+# Logs / coverage / test output
+*.log
+coverage/
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Local tooling
+.claude/
+graphify-out/
