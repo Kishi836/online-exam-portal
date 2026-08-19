@@ -438,9 +438,9 @@ valve if Sprint 4 runs tight.
 
 | Member | Role | Owns |
 |---|---|---|
-| Member 1 | Backend & data lead | Schema, authentication and RBAC, attempt lifecycle, evaluation engine, audit log, unit tests |
-| Member 2 | Frontend & UX lead | Student attempt interface, palette and timer, faculty authoring screens, accessibility compliance (NFR-E-03), usability testing |
-| Member 3 | QA, docs & delivery lead | SRS and RTM upkeep, UML diagrams, test plan and test cases, CI pipeline and linting, load and security testing, sprint artefacts, demo script |
+| **Kshitij** (repo owner) | Backend & data lead | Schema, authentication and RBAC, attempt lifecycle, evaluation engine, audit log, unit tests |
+| **Kartik** | Frontend & UX lead | Student attempt interface, palette and timer, faculty authoring screens, accessibility compliance (NFR-E-03), usability testing |
+| **Komal** | QA, docs & delivery lead | SRS and RTM upkeep, UML diagrams, test plan and test cases, CI pipeline and linting, load and security testing, sprint artefacts, demo script |
 
 All three: peer review of every pull request (NFR-O-02); shared responsibility for sprint ceremonies
 and the final viva.
