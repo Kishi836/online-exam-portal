@@ -65,8 +65,8 @@ detection.
 
 | Member | Role |
 |---|---|
-| Member 1 | Backend & data lead |
-| Member 2 | Frontend & UX lead |
-| Member 3 | QA, docs & delivery lead |
+| **Kshitij** (repo owner) | Backend & data lead |
+| **Kartik** | Frontend & UX lead |
+| **Komal** | QA, docs & delivery lead |
 
-*(Names to be filled in once teammates have repository access.)*
+All three review every pull request; sprint ceremonies and the final viva are shared.

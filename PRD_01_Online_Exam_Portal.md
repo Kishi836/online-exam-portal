@@ -419,9 +419,9 @@ improve it; neither gates go-live.
 
 | Member | Role | Owns |
 |---|---|---|
-| Member 1 | Backend & data lead | Schema, authentication and RBAC, attempt lifecycle, evaluation engine, audit log, unit tests |
-| Member 2 | Frontend & UX lead | Attempt interface, palette and timer, faculty authoring screens, accessibility (NFR-E-03), usability testing |
-| Member 3 | QA, docs & delivery lead | SRS and RTM, UML diagrams, test plan and cases, CI and linting, load and security testing, sprint artefacts, demo script |
+| **Kshitij** (repo owner) | Backend & data lead | Schema, authentication and RBAC, attempt lifecycle, evaluation engine, audit log, unit tests |
+| **Kartik** | Frontend & UX lead | Attempt interface, palette and timer, faculty authoring screens, accessibility (NFR-E-03), usability testing |
+| **Komal** | QA, docs & delivery lead | SRS and RTM, UML diagrams, test plan and cases, CI and linting, load and security testing, sprint artefacts, demo script |
 
 All three review every pull request (NFR-O-02) and share the sprint ceremonies and the final viva.
 
