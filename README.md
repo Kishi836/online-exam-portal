@@ -2,12 +2,6 @@
 
 **Online examination system with multiple-choice questions and evaluation.**
 
-Semester-long *Jackfruit* assignment for **UE23CS341A — Software Engineering**, PES University,
-Department of CSE. Assessed for 40 marks. Team of 3.
-
-The project follows the methodology taught in the course: requirements first (elicitation →
-analysis → specification → validation), then Agile/Scrum delivery in 2-week sprints, with a
-Requirements Traceability Matrix carried forward through every phase.
 
 ---
 
