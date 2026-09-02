@@ -117,18 +117,3 @@ evidentiary — the system logs and flags; a human decides.
     - Candidate gets a warning dialog on the 1st and 2nd tab switch.
     - On the 3rd violation, the exam auto-submits or flags the attempt as "Suspicious" in the instructor dashboard.
 
-
-## Scope at a glance
-
-**In:** role-based accounts · courses and enrollment · MCQ/MSQ/True-False question bank with topic
-and difficulty tagging · manual and auto-generated paper assembly · scheduled windows ·
-server-timed delivery with autosave, palette navigation, resume and auto-submit · deterministic
-automatic evaluation with configurable negative marking · post-hoc answer-key correction with bulk
-re-evaluation · scorecards, answer review and cohort statistics · integrity event logging ·
-append-only audit trail · CSV export.
-
-**Out:** descriptive answers and manual grading · webcam or AI proctoring · biometric identity
-verification · payments · adaptive testing · native mobile apps · offline mode · plagiarism
-detection.
-
-
