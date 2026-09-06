@@ -91,7 +91,7 @@ baseline were dropped in their entirety by this reduction.
 | FR-ATT-02 | Delivery | The system shall display a countdown timer whose remaining time is derived from the server clock and the attempt start time, and shall not rely on the client clock. | Student | Security / unit test | Must |
 | FR-ATT-03 | Delivery | The system shall display one question at a time together with a navigation palette showing, for every question, one of four states: Not Visited, Not Answered, Answered, or Marked for Review. | Student | UI / state test | Must |
 | FR-ATT-05 | Delivery | The system shall persist every response to the server within 5 seconds of the Student selecting it, without any explicit save action by the Student. | Student | Resilience / API test | Must |
-| FR-ATT-07 | Delivery | The system shall automatically submit an attempt, retaining all responses persisted up to that instant, when the remaining time reaches zero. | Student | Automation test | Must |
+| FR-ATT-07 | Delivery | The system shall automatically submit an attempt, retaining all responses persisted up to that instant, when the remaining time reaches zero. | System | Automation test | Must |
 | FR-ATT-08 | Delivery | The system shall allow a Student whose session was interrupted to resume the same attempt, with remaining time computed from the original server start time and with all previously persisted responses restored. | Student | Fault-injection test | Must |
 
 ### 2.7 Module G — Automatic Evaluation & Scoring
