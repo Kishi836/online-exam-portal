@@ -8,16 +8,20 @@ This file is the full handover. A session that reads it should not need to re-de
 
 ---
 
-## 1. Nothing is committed yet
+## 1. Committed and pushed; not yet on `main`
+
+Everything is on branch `docs/m1-deliverables`, pushed 2026-09-06, open as **PR #1**. It needs one
+teammate approval to merge, per `NFR-O-02`. **Until it merges, `main` still shows none of it and
+the instructor sees nothing.**
+
+For the record, this was the state at the 2026-09-02 pause, when every one of these files sat
+uncommitted on disk:
 
 ```
- M docs/CHANGELOG.md        <- CR-01 scope reduction entry, written this session
-?? Documents/               <- SRS Document.md + Test Plan Document.md, written this session
+ M docs/CHANGELOG.md        <- CR-01 scope reduction entry
+?? Documents/               <- SRS Document.md + Test Plan Document.md
 ?? docs/02-srs/             <- M1_WORK_SPLIT.md, drafted 2026-08-31, never committed
 ```
-
-All of this session's work is **uncommitted and unpushed**. Nothing is lost — it is on disk in the
-repo folder — but it is not yet visible to the team or the instructor.
 
 ## 2. What the instructor actually asked for (message received 2026-09-02)
 
