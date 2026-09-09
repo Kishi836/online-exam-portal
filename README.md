@@ -17,23 +17,7 @@ statistics.
 Three actors: **Student**, **Faculty**, **Administrator**. Integrity monitoring is automated and
 evidentiary — the system logs and flags; a human decides.
 
-## Documentation
 
-| Document | Purpose |
-|---|---|
-| [`PRD_01_Online_Exam_Portal.md`](PRD_01_Online_Exam_Portal.md) | **Product Requirements Document** — source of truth. Problem, goals, tiers, 79 requirements, NFRs, security, compliance, rollout, dependencies |
-| [`docs/01-requirements/M1_REQUIREMENTS.md`](docs/01-requirements/M1_REQUIREMENTS.md) | **M1 — Requirements Commitment.** The formally specified subset committed for this semester: 74 functional requirements, NFRs by Product/Organisational/External classification, security requirements derived by SRA, 36 user stories across 8 epics, RTM seed |
-| [`docs/CHANGELOG.md`](docs/CHANGELOG.md) | Phase-by-phase evolution log — the record of *how* the project developed, for end-of-semester presentation |
-
-## Milestones
-
-| Milestone | Deliverable | Status |
-|---|---|---|
-| **M1** | Requirements commitment: FRs, NFRs, security requirements, user stories, product backlog | ✅ Baselined |
-| **M2** | SRS (IEEE Std 830-1998), UML use-case and class diagrams, architecture, stack decision | ⬜ Sprint 1 |
-| **M3** | Design documents, ERD, sequence diagrams, working increment of Epics 1–4 | ⬜ Sprints 2–3 |
-| **M4** | Working increment of Epics 5–8, test plan, executed test cases, completed RTM | ⬜ Sprint 4 |
-| **M5** | Final demonstration, deployment, retrospective | ⬜ End of semester |
 
 ## 1. Candidate / Student Stories
 
