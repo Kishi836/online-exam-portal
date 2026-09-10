@@ -14,16 +14,27 @@ submission is **evaluated automatically** against the stored answer key — no m
 results are published at the faculty's discretion with per-question scorecards and cohort
 statistics.
 
-Three actors: **Student**, **Faculty**, **Administrator**. Integrity monitoring is automated and
+Four actors: **Student**, **Faculty**, **Administrator**, and the **Evaluation Engine** (a `«system»` actor that grades submissions without human involvement). Integrity monitoring is automated and
 evidentiary — the system logs and flags; a human decides.
 
 ## Documentation
 
+### In this repository (`main`)
+
 | Document | Purpose |
 |---|---|
-| [`PRD_01_Online_Exam_Portal.md`](PRD_01_Online_Exam_Portal.md) | **Product Requirements Document** — source of truth. Problem, goals, tiers, 79 requirements, NFRs, security, compliance, rollout, dependencies |
-| [`docs/01-requirements/M1_REQUIREMENTS.md`](docs/01-requirements/M1_REQUIREMENTS.md) | **M1 — Requirements Commitment.** The formally specified subset committed for this semester: 74 functional requirements, NFRs by Product/Organisational/External classification, security requirements derived by SRA, 36 user stories across 8 epics, RTM seed |
-| [`docs/CHANGELOG.md`](docs/CHANGELOG.md) | Phase-by-phase evolution log — the record of *how* the project developed, for end-of-semester presentation |
+| [`use_case_flow.md`](use_case_flow.md) | **Use case flows** — IEEE-style flow-of-events (preconditions, basic/alternate/exception flows, postconditions) for UC-1 … UC-7 |
+| [`use_case_flow_diagram.png`](use_case_flow_diagram.png) | **UML use case diagram** — four actors, system boundary, `«include»` / `«extend»` relationships |
+| [`user_stories.md`](user_stories.md) | **User stories** — US-01 … US-06 with acceptance criteria, grouped by actor |
+| [`SRS_table.pdf`](SRS_table.pdf) | SRS requirements table |
+
+### M1 baseline (on the [`docs/m1-deliverables`](https://github.com/Kishi836/online-exam-portal/tree/docs/m1-deliverables) branch, not yet merged to `main`)
+
+| Document | Purpose |
+|---|---|
+| [`PRD_01_Online_Exam_Portal.md`](https://github.com/Kishi836/online-exam-portal/blob/docs/m1-deliverables/PRD_01_Online_Exam_Portal.md) | **Product Requirements Document** — problem, goals, tiers, requirements, NFRs, security, compliance, rollout, dependencies |
+| [`M1_REQUIREMENTS.md`](https://github.com/Kishi836/online-exam-portal/blob/docs/m1-deliverables/docs/01-requirements/M1_REQUIREMENTS.md) | **M1 — Requirements Commitment.** Functional requirements, NFRs by Product/Organisational/External classification, security requirements derived by SRA, user stories by epic, RTM seed |
+| [`CHANGELOG.md`](https://github.com/Kishi836/online-exam-portal/blob/docs/m1-deliverables/docs/CHANGELOG.md) | Phase-by-phase evolution log — the record of *how* the project developed, for end-of-semester presentation |
 
 ## Milestones
 

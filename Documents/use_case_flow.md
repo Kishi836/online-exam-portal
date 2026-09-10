@@ -27,7 +27,7 @@ Mark Question for Review, Resume After Disconnection, Submit Exam
 7. Student navigates to the next/previous question via the palette or Next/Previous controls.
 8. Steps 4–7 repeat until the student has attempted all questions or chooses to submit.
 9. Student clicks "Submit Exam."
-10. System executes UC-3 (Submit Exam).
+10. System executes UC-2 (Submit Exam).
 
 **Alternate Flows**
 - **A1 — Mark for Review:** At step 4, student marks the question for review instead of (or in
@@ -44,10 +44,10 @@ Mark Question for Review, Resume After Disconnection, Submit Exam
 **Exception Flows**
 - **E1 — Timer Expires (00:00):** At any point in steps 4–8, if the countdown reaches zero,
   system immediately locks all inputs and auto-submits the current response set
-  (`<<extend>> Auto-Submit on Timer Expiry`). Flow proceeds to UC-3 without student action.
+  (`<<extend>> Auto-Submit on Timer Expiry`). Flow proceeds to UC-2 without student action.
 - **E2 — Third Focus-Loss Violation:** If UC-6 (Monitor Focus Loss) reports a 3rd violation
   during the attempt, system either force-submits the attempt or flags it as "Suspicious"
-  (per faculty configuration) and proceeds to UC-3.
+  (per faculty configuration) and proceeds to UC-2.
 - **E3 — Autosave Failure:** If autosave fails (e.g., transient network error), system retries
   with backoff and displays a non-blocking "reconnecting" indicator; student may continue
   answering locally until connectivity is restored. If unresolved by end of exam window, E1
@@ -55,7 +55,7 @@ Mark Question for Review, Resume After Disconnection, Submit Exam
 
 **Postconditions**
 - All responses are persisted server-side.
-- Exam attempt status transitions to "Submitted" and is queued for evaluation (UC-5).
+- Exam attempt status transitions to "Submitted" and is queued for evaluation (UC-3).
 
 ---
 
@@ -72,7 +72,7 @@ Mark Question for Review, Resume After Disconnection, Submit Exam
 3. Student confirms submission.
 4. System freezes the response set, stops the timer, and marks the attempt as "Submitted"
    with a server-side timestamp.
-5. System dispatches the attempt to the Evaluation Engine (UC-5) asynchronously.
+5. System dispatches the attempt to the Evaluation Engine (UC-3) asynchronously.
 6. System displays a submission acknowledgment to the student.
 
 **Alternate Flows**
