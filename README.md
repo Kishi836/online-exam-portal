@@ -34,15 +34,15 @@ evidentiary — the system logs and flags; a human decides.
     - When the timer hits `00:00`, the exam auto-locks and submits the candidate's current responses automatically.
         
 
-### US-02: Instant Result & Score Breakdown
+### US-02: Result & Score Breakdown
 
 > **As a** student,
-> **I want to** see my evaluated score and breakdown immediately after submitting (if permitted by the instructor),
+> **I want to** see my evaluated score and breakdown as soon as the instructor publishes results,
 > **So that** I can understand my performance without waiting days for manual grading.
 
 - **Acceptance Criteria:**
     
-    - Displays overall score, percentage, and pass/fail status immediately upon submission.
+    - Displays overall score, percentage, and pass/fail status once the instructor publishes results (UC-7). Until then, the attempt shows only as submitted, with no score or pass/fail.
     - Provides a section-wise breakdown (e.g., Data Structures, Algorithms).
     - Hides correct answer explanations if the instructor disabled post-exam review.
 ## 2. Instructor / Examiner Stories

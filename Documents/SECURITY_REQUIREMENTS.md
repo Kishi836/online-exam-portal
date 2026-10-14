@@ -6,7 +6,7 @@
 | **Version** | 0.1 — Draft for M2 SRS integration |
 | **Date** | 14 October 2026 |
 | **Derived from** | `SRS_table.pdf`, `use_case_flow.md` (UC-1 … UC-7), `user_stories.md` (US-01 … US-06), `README.md` |
-| **Companion to** | `M1_REQUIREMENTS.md` (security requirements seed), future M2 SRS (IEEE Std 830-1998) |
+| **Companion to** | [`M1_REQUIREMENTS.md`](https://github.com/Kishi836/online-exam-portal/blob/docs/m1-deliverables/docs/01-requirements/M1_REQUIREMENTS.md) (security requirements seed, on the `docs/m1-deliverables` branch), future M2 SRS (IEEE Std 830-1998) |
 
 ---
 
@@ -270,7 +270,7 @@ STRIDE-style analysis of the threats most relevant to this system. "Mitigated by
 |---|---|---|---|---|---|---|
 | **SEC-PRV-01** | Students SHALL be told, before starting an attempt, which integrity signals are monitored (focus loss, tab switch, full-screen exit) and how they may be used. Monitoring SHALL be limited to the signals listed in this document. | Must | S/M/L | Derived | US-06, UC-6 | Inspection |
 | **SEC-PRV-02** | Retention periods for attempts, scorecards, integrity events and audit logs SHALL be defined, and expired data SHALL be deleted or anonymised on schedule. | Should | M/L | Derived | SRS-ADM-01 | Inspection |
-| **SEC-PRV-03** | The system SHALL comply with the data-protection regulations applicable to the deploying institution (for example India's DPDP Act 2023, or FERPA/GDPR where relevant). The applicable regime SHALL be confirmed against the PRD compliance section. | Should | M/L | Derived | PRD | Analysis |
+| **SEC-PRV-03** | The system SHALL comply with the data-protection regulations applicable to the deploying institution (for example India's DPDP Act 2023, or FERPA/GDPR where relevant). The applicable regime SHALL be confirmed against the [PRD](https://github.com/Kishi836/online-exam-portal/blob/docs/m1-deliverables/PRD_01_Online_Exam_Portal.md) compliance section. | Should | M/L | Derived | PRD | Analysis |
 
 ---
 
@@ -330,7 +330,7 @@ Maps each security-relevant SRS requirement to the security requirements that im
 | UC-6 Monitor Focus Loss | SEC-INT-05, 06, SEC-AUD-04, SEC-PRV-01 |
 | UC-7 Publish Results | SEC-AZ-04, 05, SEC-DATA-03, SEC-AUD-04 |
 | US-01 Timed session | SEC-INT-01, SEC-AVL-01 |
-| US-02 Instant result | SEC-AZ-04, 05 (see OI-01) |
+| US-02 Result & score breakdown | SEC-AZ-04, 05 (OI-01, resolved) |
 | US-03 Question bank | SEC-API-01 – 05, SEC-DATA-01, 02 |
 | US-04 Test configuration | SEC-API-01, SEC-INT-04 |
 | US-05 Evaluation engine | SEC-AVL-02, 03 (see OI-02) |
@@ -363,12 +363,12 @@ While deriving these requirements, the following conflicts and gaps were found a
 
 | ID | Issue | Where | Security impact | Recommendation |
 |---|---|---|---|---|
-| **OI-01** | **Result visibility timing.** US-02 says students see results "immediately after submitting". SRS-RES-01 and UC-7 say results stay hidden until Faculty explicitly publishes. | US-02 vs SRS-RES-01, UC-3 A1, UC-7 | High — determines whether results are gated at all. | Treat publication-gated release as the rule. Reword US-02 to "once published", or add an explicit per-exam *instant release* policy that Faculty can switch on. |
+| **OI-01** | **Result visibility timing.** US-02 says students see results "immediately after submitting". SRS-RES-01 and UC-7 say results stay hidden until Faculty explicitly publishes. | US-02 vs SRS-RES-01, UC-3 A1, UC-7 | High — determines whether results are gated at all. | Treat publication-gated release as the rule. Reword US-02 to "once published", or add an explicit per-exam *instant release* policy that Faculty can switch on. **Resolved 14 Oct 2026:** publication-gated release only. US-02 reworded; no instant-release policy. |
 | **OI-02** | **Evaluation time target.** US-05 / UC-3 say ≤ 2 s per submission; SRS-EVL-06 says ≤ 5 s for a 100-question paper. | US-05, UC-3 step 7 vs SRS-EVL-06 | Low — but the acceptance test must be unambiguous. | Pick one metric (suggest per-submission, per paper size) and update the other documents. |
 | **OI-03** | **Answer-key lock vs. key correction.** UC-7 locks the key at publication; SRS-EVL-07 allows post-exam key updates with bulk re-evaluation. | UC-7 step 6 vs SRS-EVL-07 | Medium — a lock that can be bypassed silently is not a lock. | Define the correction path (SEC-DATA-03): authorized, reasoned, audited, with re-evaluation and student notification. |
 | **OI-04** | **Focus-loss enforcement is not in the SRS.** SRS-INT-01 only *captures* events. The warn → auto-submit/flag policy (US-06, UC-6) has no SRS entry, and the SRS has no INT-02 … INT-06. | SRS-INT-01 vs US-06, UC-6 | Medium — the behaviour users were promised has no requirement or test behind it. | Add SRS entries for the warning dialogs, the 3-strike policy, the flag, and the reviewer dashboard (SEC-INT-05/06). |
 | **OI-05** | **Who owns the violation policy?** US-06 and UC-6 name the Administrator as rule owner; UC-1 E2 and UC-6 step 4 say "per faculty configuration". | UC-1 E2, UC-6, US-06 | Low–Medium — unclear ownership means unclear authorization. | Decide: Admin sets a global default; Faculty may override per exam (or not). Reflect in RBAC. |
-| **OI-06** | **Faculty/Admin onboarding undefined.** SRS-AUTH01 describes self-registration capturing a roll number (a student attribute). No requirement says how Faculty or Admin accounts are created. | SRS-AUTH01 / AUTH06 | **High** — an open path to privilege escalation. | Adopt SEC-AUTH-03: self-registration creates Students only; staff are provisioned by Admin. |
+| **OI-06** | **Faculty/Admin onboarding undefined.** SRS-AUTH01 describes self-registration capturing a roll number (a student attribute). No requirement says how Faculty or Admin accounts are created. | SRS-AUTH01 / AUTH06 | **High** — an open path to privilege escalation. | Adopt SEC-AUTH-03: self-registration creates Students only; staff are provisioned by Admin. **Resolved 14 Oct 2026:** SEC-AUTH-03 adopted. SRS-AUTH01/AUTH06 to be reworded to match in the M2 SRS. |
 | **OI-07** | **Email verification is only "Should" and absent from Tier S.** Without it, anyone can register with any institutional-looking address. | SRS-AUTH02 | Medium (Tier S). | Keep the domain allowlist and roster check (SEC-AUTH-04, 08) in all tiers, or promote AUTH02 to Must. |
 | **OI-08** | **Bulk-import semantics differ.** SRS-CRS-05 is all-or-nothing (enrollments); UC-4 A1 imports valid question records and rejects the rest. | SRS-CRS-05 vs UC-4 A1 | Low — but ambiguous behaviour causes test disputes. | Confirm intent: all-or-nothing for enrollments, partial-with-report for questions. State it explicitly. |
 | **OI-09** | **Rich content and upload risks have no SRS entries.** US-03 requires rich text, code snippets, image attachments and CSV/JSON upload. The SRS table has no matching security requirement. | US-03, UC-4 vs SRS-QB-* | High — stored XSS and malicious uploads. | Add SRS items that reference SEC-API-03/04/05. |

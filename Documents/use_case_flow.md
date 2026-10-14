@@ -231,4 +231,4 @@ Shuffling (include)
 Each flow above maps to the corresponding `usecase` node in the PlantUML diagram
 (`UC_AttemptExam`, `UC_Evaluate`, `UC_CreateQ`, `UC_ConfigTest`/`UC_ScheduleExam`,
 `UC_MonitorFocus`/`UC_FlagAttempt`, `UC_PublishResults`) and can seed the RTM (Requirements
-Traceability Matrix) referenced in `M1_REQUIREMENTS.md`.
+Traceability Matrix) referenced in [`M1_REQUIREMENTS.md`](https://github.com/Kishi836/online-exam-portal/blob/docs/m1-deliverables/docs/01-requirements/M1_REQUIREMENTS.md) (on the `docs/m1-deliverables` branch).

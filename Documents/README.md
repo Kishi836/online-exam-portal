@@ -27,6 +27,7 @@ evidentiary — the system logs and flags; a human decides.
 | [`use_case_flow_diagram.png`](use_case_flow_diagram.png) | **UML use case diagram** — four actors, system boundary, `«include»` / `«extend»` relationships |
 | [`user_stories.md`](user_stories.md) | **User stories** — US-01 … US-06 with acceptance criteria, grouped by actor |
 | [`SRS_table.pdf`](SRS_table.pdf) | SRS requirements table |
+| [`SECURITY_REQUIREMENTS.md`](SECURITY_REQUIREMENTS.md) | **Security requirements** — threat analysis, SEC-* requirements traced to the SRS, use cases and user stories, verification strategy, open issues |
 
 ### M1 baseline (on the [`docs/m1-deliverables`](https://github.com/Kishi836/online-exam-portal/tree/docs/m1-deliverables) branch, not yet merged to `main`)
 
@@ -61,15 +62,15 @@ evidentiary — the system logs and flags; a human decides.
     - When the timer hits `00:00`, the exam auto-locks and submits the candidate's current responses automatically.
         
 
-### US-02: Instant Result & Score Breakdown
+### US-02: Result & Score Breakdown
 
 > **As a** student,
-> **I want to** see my evaluated score and breakdown immediately after submitting (if permitted by the instructor),
+> **I want to** see my evaluated score and breakdown as soon as the instructor publishes results,
 > **So that** I can understand my performance without waiting days for manual grading.
 
 - **Acceptance Criteria:**
     
-    - Displays overall score, percentage, and pass/fail status immediately upon submission.
+    - Displays overall score, percentage, and pass/fail status once the instructor publishes results (UC-7). Until then, the attempt shows only as submitted, with no score or pass/fail.
     - Provides a section-wise breakdown (e.g., Data Structures, Algorithms).
     - Hides correct answer explanations if the instructor disabled post-exam review.
 ## 2. Instructor / Examiner Stories
