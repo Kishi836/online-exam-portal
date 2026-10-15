@@ -20,7 +20,9 @@ the stored answer key, and results are released when Faculty publishes them.
 
 | Document | Contents |
 |---|---|
-| [`Documents/SRS.pdf`](Documents/SRS.pdf) | **Software Requirements Specification** — 30 functional and 14 non-functional requirements in the course template (ID, type, description, priority, acceptance criteria, rationale), use case diagram and flows for UC-01 … UC-13 |
+| [`Documents/SRS.pdf`](Documents/SRS.pdf) | **Software Requirements Specification** — table of 30 functional and 14 non-functional requirements in the course template (ID, type, description, priority, acceptance criteria, rationale, comments) |
+| [`Documents/Use_Case_Diagram.pdf`](Documents/Use_Case_Diagram.pdf) | **Use Case Diagram** — UML diagram of the 4 actors and 13 use cases, their «include» / «extend» relationships, and the requirements and test cases behind each use case |
+| [`Documents/Use_Case_Flow.pdf`](Documents/Use_Case_Flow.pdf) | **Use Case Flow** — main success scenario, alternate and exception flows and business rules for UC-01 … UC-13, and the end-to-end examination lifecycle |
 | [`Documents/SAD.pdf`](Documents/SAD.pdf) | **Software Architecture Document** — layered architecture and why, UML component diagram, interfaces, technology stack (Django + SQLite), deployment |
 | [`Documents/Test_Plan.pdf`](Documents/Test_Plan.pdf) | **Test Plan** — 118 unit, integration and system test cases in the course template, 8–10 per use case, covering all 30 FRs |
 | [`Documents/Sprint_Plan.pdf`](Documents/Sprint_Plan.pdf) | **Sprint Plan** — backlog, story points, owners, Sprint 1 (19–23 Oct) and Sprint 2 (26–30 Oct) |
