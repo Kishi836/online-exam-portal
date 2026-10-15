@@ -13,7 +13,7 @@
 
 This document specifies the functional and non-functional requirements of the Online Examination
 Portal. It is the single source for the GitHub backlog (one backlog item per requirement), the
-Software Architecture Document (`Documents/SAD.md`) and the Test Plan (`Documents/Test_Plan.md`).
+Software Architecture Document (`Documents/markdown/SAD.md`) and the Test Plan (`Documents/markdown/Test_Plan.md`).
 
 ### 1.2 Scope
 
@@ -136,7 +136,7 @@ that implements it. Requirement IDs are sequential with no gaps: `FR-001` … `F
 | NFR-004 | Non-functional (Reliability) | After an unplanned server restart, the system shall restore service within 60 seconds, with every in-progress attempt resumable with its saved responses and correct remaining time. | High | Pass: killing and restarting the server during an attempt restores service in ≤ 60 s and the attempt resumes intact. | A crash must not void an examination. | Sprint 2 |
 | NFR-005 | Non-functional (Portability) | The system shall work on the two latest versions of Chrome, Edge and Firefox, and remain usable at viewport widths of 360 px and above. | Medium | Pass: the attempt flow completes on each browser and at 360 px width without horizontal scrolling. | Students use their own devices. | Sprint 2 |
 | NFR-006 | Non-functional (Organisational) | All code and documents shall be held in one Git repository; work shall proceed on feature branches; every merge to `main` shall be through a pull request raised by the assigned member and reviewed by another member. | High | Pass: the GitHub history shows no direct commits to `main` after 19 Oct, and every merged PR has a reviewer other than its author. | Required by the course; keeps `main` working. | Sprint 1 |
-| NFR-007 | Non-functional (Organisational) | Every functional requirement shall be linked to at least one test case in the Test Plan. | Medium | Pass: the coverage table of `Documents/Test_Plan.md` lists all 30 FRs. | Untested requirements are unverified claims. | Sprint 2 |
+| NFR-007 | Non-functional (Organisational) | Every functional requirement shall be linked to at least one test case in the Test Plan. | Medium | Pass: the coverage table of `Documents/markdown/Test_Plan.md` lists all 30 FRs. | Untested requirements are unverified claims. | Sprint 2 |
 | NFR-008 | Non-functional (Legal) | Personal data shall be handled per the Digital Personal Data Protection Act, 2023: consent at registration, collection only for examination use, and erasure on request within 30 days. | Low | Pass: registration cannot complete without ticking consent; an Administrator can erase a Student's personal data. | Indian law applies to student data. | Sprint 2 |
 | NFR-009 | Non-functional (Accessibility) | The attempt flow shall meet WCAG 2.1 Level AA: fully keyboard-operable, text contrast at least 4.5:1, and every option control labelled for screen readers. | Medium | Pass: an axe/Lighthouse audit reports no AA violations, and the whole attempt can be completed with the keyboard alone. | Every student must be able to sit the exam. | Sprint 2 |
 | NFR-010 | Non-functional (Maintainability) | Examination policy values — window, pass mark and negative marking — shall be configurable per examination and shall not be hard-coded. | Medium | Pass: code review finds no hard-coded pass mark or negative-marking value; changing them on an examination changes its scoring. | Departments use different rules. | Sprint 2 |
@@ -153,7 +153,7 @@ that implements it. Requirement IDs are sequential with no gaps: `FR-001` … `F
 
 ### 4.1 Use case diagram
 
-![UML use case diagram — Online Examination Portal](use_case_diagram.png)
+![UML use case diagram — Online Examination Portal](../use_case_diagram.png)
 
 Source: `Documents/diagrams/use_case_diagram.drawio` (open in draw.io).
 
@@ -1035,7 +1035,7 @@ Two conventions hold throughout and are not repeated in each use case:
 **Assumptions and dependencies.** Students have a personal device with a supported browser and an
 internet connection · examinations are attempted remotely · the server clock is synchronised by
 NTP, since every timing rule depends on it · the system is a single Django application with an
-SQLite database, deployed on one Linux virtual machine for the demonstration (see `Documents/SAD.md`).
+SQLite database, deployed on one Linux virtual machine for the demonstration (see `Documents/markdown/SAD.md`).
 
 **Open items** awaiting the course instructor; the assumption taken is used throughout this SRS and
 the Test Plan:
@@ -1050,6 +1050,6 @@ the Test Plan:
 | Artefact | Where |
 |---|---|
 | Backlog — one GitHub issue per FR / NFR, with story points, assignee and sprint | GitHub Project *Online Exam Portal - Backlog* |
-| Sprint 1 and Sprint 2 plan | `Documents/Sprint_Plan.md` |
-| Architecture — components realising each requirement group | `Documents/SAD.md` |
-| Test cases for every functional requirement (118 cases, 13 use cases) | `Documents/Test_Plan.md` |
+| Sprint 1 and Sprint 2 plan | `Documents/markdown/Sprint_Plan.md` |
+| Architecture — components realising each requirement group | `Documents/markdown/SAD.md` |
+| Test cases for every functional requirement (118 cases, 13 use cases) | `Documents/markdown/Test_Plan.md` |

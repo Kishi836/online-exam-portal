@@ -9,7 +9,7 @@
 ## 1. Backlog
 
 The backlog is the GitHub Project **Online Exam Portal - Backlog**, linked to this repository. It
-holds **one issue per requirement in `Documents/SRS.md`** — 30 functional (`FR-001`…`FR-030`) and
+holds **one issue per requirement in `Documents/markdown/SRS.md`** — 30 functional (`FR-001`…`FR-030`) and
 14 non-functional (`NFR-001`…`NFR-014`) — each with story points, an assignee, a priority taken from
 the SRS and a sprint.
 
@@ -108,12 +108,12 @@ Sprint 2 video shows the full lifecycle including resume, publication and the au
 1. The code is merged into `main` through a pull request raised by the item's owner and reviewed by
    another team member (NFR-006).
 2. The GitHub Actions check is green on that pull request.
-3. The item's test cases in `Documents/Test_Plan.md` have been executed and their *Actual Result*
+3. The item's test cases in `Documents/markdown/Test_Plan.md` have been executed and their *Actual Result*
    and *Test Result* columns filled in.
 4. The issue is closed by the merge and its board card is in *Done*.
 
 **Deviations.** Any departure from the SRS, SAD or Test Plan is recorded in
-`Documents/Deviations.md` when it happens — what changed, why, and which requirement it affects —
+`Documents/markdown/Deviations.md` when it happens — what changed, why, and which requirement it affects —
 for explanation at the final demo. Development is **frozen** at the end of Sprint 2 (30 Oct); after
 that only documentation changes.
 
