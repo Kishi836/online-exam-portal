@@ -18,14 +18,15 @@ the stored answer key, and results are released when Faculty publishes them.
 
 ## Documents
 
-Each document is in Markdown (readable here) with a Word and PDF copy alongside it.
+Markdown sources (readable here) are in `Documents/markdown/`; the Word and PDF copies of each
+are in `Documents/`.
 
 | Document | Contents |
 |---|---|
-| [`Documents/SRS.md`](Documents/SRS.md) | **Software Requirements Specification** — 30 functional and 14 non-functional requirements in the course template (ID, type, description, priority, acceptance criteria, rationale), use case diagram and flows for UC-01 … UC-13 |
-| [`Documents/SAD.md`](Documents/SAD.md) | **Software Architecture Document** — layered architecture and why, UML component diagram, interfaces, technology stack (Django + SQLite), deployment |
-| [`Documents/Test_Plan.md`](Documents/Test_Plan.md) | **Test Plan** — 118 unit, integration and system test cases in the course template, 8–10 per use case, covering all 30 FRs |
-| [`Documents/Sprint_Plan.md`](Documents/Sprint_Plan.md) | **Sprint Plan** — backlog, story points, owners, Sprint 1 (19–23 Oct) and Sprint 2 (26–30 Oct) |
+| [`Documents/markdown/SRS.md`](Documents/markdown/SRS.md) | **Software Requirements Specification** — 30 functional and 14 non-functional requirements in the course template (ID, type, description, priority, acceptance criteria, rationale), use case diagram and flows for UC-01 … UC-13 |
+| [`Documents/markdown/SAD.md`](Documents/markdown/SAD.md) | **Software Architecture Document** — layered architecture and why, UML component diagram, interfaces, technology stack (Django + SQLite), deployment |
+| [`Documents/markdown/Test_Plan.md`](Documents/markdown/Test_Plan.md) | **Test Plan** — 118 unit, integration and system test cases in the course template, 8–10 per use case, covering all 30 FRs |
+| [`Documents/markdown/Sprint_Plan.md`](Documents/markdown/Sprint_Plan.md) | **Sprint Plan** — backlog, story points, owners, Sprint 1 (19–23 Oct) and Sprint 2 (26–30 Oct) |
 | [`Documents/diagrams/`](Documents/diagrams) | draw.io sources of the use case and component diagrams |
 
 ## Backlog

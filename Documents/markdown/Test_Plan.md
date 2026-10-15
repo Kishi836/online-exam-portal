@@ -13,7 +13,7 @@
 Test cases for the Online Examination Portal, written to the template issued in
 `Test Plan Document.docx`. Coverage is **8–10 test cases per use case** across **13 use cases**,
 spanning **Unit, Integration and System** testing, and collectively exercising **all 30 functional
-requirements** in `Documents/SRS.md`. Use case IDs and requirement IDs are those of the SRS.
+requirements** in `Documents/markdown/SRS.md`. Use case IDs and requirement IDs are those of the SRS.
 
 ## 2. Test Case ID convention
 
@@ -301,7 +301,7 @@ Verifies `FR-028`, `FR-029`, `FR-030`.
 | **Total** | **30 of 30** | **68** | **37** | **13** | **118** |
 
 Every use case carries at least eight test cases, and every one of the 30 functional requirements of
-`Documents/SRS.md` is exercised by at least one test case — satisfying NFR-007.
+`Documents/markdown/SRS.md` is exercised by at least one test case — satisfying NFR-007.
 
 ## 8. Open items affecting these test cases
 

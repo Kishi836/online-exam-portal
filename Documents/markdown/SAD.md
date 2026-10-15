@@ -11,7 +11,7 @@
 
 This document records the architecture chosen for the Online Examination Portal: the architectural
 style, the components and the interfaces between them, the technology each layer is built with,
-and why. Every component traces to requirements in `Documents/SRS.md`.
+and why. Every component traces to requirements in `Documents/markdown/SRS.md`.
 
 ## 2. Architecture selection
 
@@ -56,7 +56,7 @@ through one repository with indexed foreign keys, which is what NFR-001 (95% of 
 
 ## 3. Component diagram
 
-![UML component diagram — Online Examination Portal](component_diagram.png)
+![UML component diagram — Online Examination Portal](../component_diagram.png)
 
 Source: `Documents/diagrams/component_diagram.drawio` (open in draw.io). Notation: a ball is a
 **provided** interface on the component that implements it; a socket is a **required** interface
