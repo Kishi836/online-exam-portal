@@ -32,6 +32,47 @@ the stored answer key, and results are released when Faculty publishes them.
 GitHub Project **Online Exam Portal - Backlog**: one issue per SRS requirement (`FR-001` … `FR-030`,
 `NFR-001` … `NFR-014`) with story points, assignee, priority and sprint.
 
+## Run locally
+
+Python 3.10+ (CI uses 3.12). From the repository root, in PowerShell:
+
+```powershell
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+$env:DJANGO_SECRET_KEY = "dev-only"   # required: the app will not start without it (NFR-014)
+$env:DJANGO_DEBUG = "1"
+python manage.py migrate
+python manage.py createsuperuser      # creates an Administrator
+python manage.py runserver
+```
+
+Sign in at <http://127.0.0.1:8000/login/>. Django's admin site is at `/django-admin/`, because `/admin/` is reserved for the Administrator role's pages.
+Run the tests with `python manage.py test`.
+
+### Where code goes
+
+| App | SAD component | Requirements |
+|---|---|---|
+| `repository` | Exam Repository: **every model lives here** | — |
+| `identity` | Identity & Enrollment Manager | FR-001 – FR-006, FR-015 |
+| `questionbank` | Question Bank Manager | FR-007 – FR-009 |
+| `examsetup` | Exam Setup Manager | FR-010 – FR-013 |
+| `attempts` | Attempt Session Manager | FR-015 – FR-021, FR-029 |
+| `evaluation` | Evaluation Engine | FR-022 – FR-024 |
+
+**Every view must declare who may use it** (FR-003). Access is denied by default, so a view without a decorator returns 403 to everyone:
+
+```python
+from identity.access import roles, public
+from repository.models import Role
+
+@roles(Role.FACULTY)
+def question_list(request): ...
+```
+
+Use `@public` only for sign-in, sign-out and registration.
+
 ## Workflow
 
 Work happens on feature branches. The member who owns a backlog item raises the pull request that
