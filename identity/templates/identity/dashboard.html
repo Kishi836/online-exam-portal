@@ -1,0 +1,8 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Dashboard</title></head>
+<body>
+  <p>Signed in as {{ user.email }} ({{ user.get_role_display }}).</p>
+  <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit">Sign out</button></form>
+</body>
+</html>
