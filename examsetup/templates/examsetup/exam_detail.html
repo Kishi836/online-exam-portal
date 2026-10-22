@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{{ exam.title }}</title>
+  </head>
+  <body>
+    <h1>{{ exam.title }}</h1>
+
+    <p>
+      <strong>Course:</strong> {{ exam.course.code }} — {{ exam.course.title }}
+    </p>
+    <p><strong>Status:</strong> {{ exam.get_status_display }}</p>
+    <p><strong>Duration:</strong> {{ exam.duration_minutes }} minutes</p>
+    <p><strong>Total marks:</strong> {{ exam.total_marks }}</p>
+    <p><strong>Pass mark:</strong> {{ exam.pass_mark_percent }}%</p>
+    <p><strong>Instructions:</strong> {{ exam.instructions|default:"None" }}</p>
+    <p>
+      <strong>Negative marking:</strong> {{
+      exam.negative_marking|yesno:"Enabled,Disabled" }}
+    </p>
+    <p>
+      <strong>Shuffle questions:</strong> {{
+      exam.shuffle_questions|yesno:"Yes,No" }}
+    </p>
+    <p>
+      <strong>Shuffle options:</strong> {{ exam.shuffle_options|yesno:"Yes,No"
+      }}
+    </p>
+
+    <h2>Questions</h2>
+    {% if exam_questions %}
+    <ol>
+      {% for item in exam_questions %}
+      <li>
+        {{ item.question.stem }} ({{ item.question.positive_marks }} marks)
+      </li>
+      {% endfor %}
+    </ol>
+    {% else %}
+    <p>No questions added yet.</p>
+    {% endif %} {% if exam.status == "DRAFT" %}
+    <p><a href="{% url 'exam-edit' exam.id %}">Edit Draft</a></p>
+    <p><a href="{% url 'exam-add-questions' exam.id %}">Add Questions</a></p>
+
+    <form method="post" action="{% url 'exam-publish' exam.id %}">
+      {% csrf_token %}
+      <button type="submit">Publish Exam</button>
+    </form>
+    {% endif %}
+
+    <p><a href="{% url 'exam-list' %}">Back to exams</a></p>
+  </body>
+</html>
