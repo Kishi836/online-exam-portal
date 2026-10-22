@@ -15,6 +15,7 @@ def home(request):
     return redirect(f"{request.user.role.lower()}-dashboard")
 
 
+# Placeholder dashboards so each role has a landing page; the real ones are FR-014 and the consoles.
 @roles(Role.STUDENT)
 def student_dashboard(request):
     return render(request, "identity/dashboard.html")
@@ -51,7 +52,8 @@ def course_create(request):
         form = CourseForm()
 
     return render(
-        request, "identity/course_form.html",
+        request,
+        "identity/course_form.html",
         {"form": form, "heading": "Create course"},
     )
 
@@ -70,7 +72,8 @@ def course_edit(request, course_id):
         form = CourseForm(instance=course)
 
     return render(
-        request, "identity/course_form.html",
+        request,
+        "identity/course_form.html",
         {"form": form, "heading": "Edit course"},
     )
 
@@ -91,27 +94,38 @@ def faculty_courses(request):
     courses = Course.objects.filter(
         faculty=request.user
     ).prefetch_related("students").order_by("semester", "code")
-    return render(request, "identity/faculty_courses.html", {"courses": courses})
+    return render(
+        request, "identity/faculty_courses.html", {"courses": courses}
+    )
 
 
-@roles(Role.FACULTY)
+@roles(Role.FACULTY, Role.ADMIN)
 @require_GET
 def course_roster(request, course_id):
     course = get_object_or_404(Course, pk=course_id)
-    if not course.faculty.filter(pk=request.user.pk).exists():
+
+    if (
+        request.user.role != Role.ADMIN
+        and not course.faculty.filter(pk=request.user.pk).exists()
+    ):
         raise PermissionDenied("You are not assigned to this course.")
 
     students = course.students.filter(role=Role.STUDENT).order_by("full_name")
     return render(
-        request, "identity/course_roster.html",
+        request,
+        "identity/course_roster.html",
         {"course": course, "students": students},
     )
 
 
-@roles(Role.FACULTY)
+@roles(Role.FACULTY, Role.ADMIN)
 def course_enroll(request, course_id):
     course = get_object_or_404(Course, pk=course_id)
-    if not course.faculty.filter(pk=request.user.pk).exists():
+
+    if (
+        request.user.role != Role.ADMIN
+        and not course.faculty.filter(pk=request.user.pk).exists()
+    ):
         raise PermissionDenied("You are not assigned to this course.")
 
     if course.archived:
@@ -132,16 +146,21 @@ def course_enroll(request, course_id):
         form = EnrollmentForm()
 
     return render(
-        request, "identity/enrollment_form.html",
+        request,
+        "identity/enrollment_form.html",
         {"form": form, "course": course},
     )
 
 
-@roles(Role.FACULTY)
+@roles(Role.FACULTY, Role.ADMIN)
 @require_POST
 def course_unenroll(request, course_id, student_id):
     course = get_object_or_404(Course, pk=course_id)
-    if not course.faculty.filter(pk=request.user.pk).exists():
+
+    if (
+        request.user.role != Role.ADMIN
+        and not course.faculty.filter(pk=request.user.pk).exists()
+    ):
         raise PermissionDenied("You are not assigned to this course.")
 
     student = get_object_or_404(User, pk=student_id, role=Role.STUDENT)
