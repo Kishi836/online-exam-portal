@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Available Exams</title>
+  </head>
+  <body>
+    <h1>Available Exams</h1>
+
+    {% if exams %}
+    <ul>
+      {% for exam in exams %}
+      <li>
+        <a href="{% url 'student-exam-detail' exam.id %}"> {{ exam.title }} </a>
+        — {{ exam.course.code }} {{ exam.course.title }} — {{
+        exam.duration_minutes }} minutes
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>No published exams are available for your enrolled courses.</p>
+    {% endif %}
+
+    <p><a href="{% url 'student-dashboard' %}">Back to dashboard</a></p>
+  </body>
+</html>
