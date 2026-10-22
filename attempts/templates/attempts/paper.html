@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>{{ attempt.exam.title }}</title></head>
+<body>
+  <h1>{{ attempt.exam.title }}</h1>
+  <p>Started at {{ attempt.started_at|time:"H:i" }} &middot; {{ attempt.exam.duration_minutes }} minutes</p>
+  {% for q in questions %}
+    <fieldset>
+      <legend>{{ forloop.counter }}. {{ q.stem }}</legend>
+      {% for o in q.options %}
+        <label><input type="radio" name="q{{ q.id }}" value="{{ o.id }}"> {{ o.text }}</label><br>
+      {% endfor %}
+    </fieldset>
+  {% endfor %}
+</body>
+</html>
