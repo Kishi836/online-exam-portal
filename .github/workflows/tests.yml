@@ -7,6 +7,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      DJANGO_SECRET_KEY: ci-only-not-a-real-secret
     steps:
       - uses: actions/checkout@v4
 
@@ -18,7 +20,8 @@ jobs:
         if: hashFiles('requirements.txt') != ''
         run: pip install -r requirements.txt
 
-      # Skipped until the Sprint 1 Django skeleton adds manage.py at the repo root.
+      - name: Check for missing migrations
+        run: python manage.py makemigrations --check --dry-run
+
       - name: Run Django tests
-        if: hashFiles('manage.py') != ''
         run: python manage.py test
