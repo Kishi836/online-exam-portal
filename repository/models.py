@@ -130,6 +130,7 @@ class Exam(models.Model):
     pass_mark_percent = models.DecimalField(max_digits=5, decimal_places=2)
     status = models.CharField(
         max_length=9, choices=Status.choices, default=Status.DRAFT)
+    published_at = models.DateTimeField(null=True, blank=True)
     window_start = models.DateTimeField(null=True, blank=True)
     window_end = models.DateTimeField(null=True, blank=True)
     questions = models.ManyToManyField(
