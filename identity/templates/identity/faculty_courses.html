@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>My Courses</title>
+  </head>
+  <body>
+    <h1>My Courses</h1>
+
+    {% if messages %} {% for message in messages %}
+    <p>{{ message }}</p>
+    {% endfor %} {% endif %} {% if courses %}
+    <ul>
+      {% for course in courses %}
+      <li>
+        <strong>{{ course.code }} — {{ course.title }}</strong>
+        (Semester {{ course.semester }}) {% if course.archived %}(Archived){%
+        endif %} — <a href="{% url 'course-roster' course.pk %}">View roster</a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>You have no assigned courses.</p>
+    {% endif %}
+
+    <p><a href="{% url 'faculty-dashboard' %}">Back to dashboard</a></p>
+  </body>
+</html>

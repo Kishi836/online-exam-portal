@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Enroll Student</title>
+  </head>
+  <body>
+    <h1>Enroll Student</h1>
+    <p>Course: {{ course.code }} — {{ course.title }}</p>
+
+    <form method="post">
+      {% csrf_token %} {{ form.non_field_errors }}
+
+      <p>
+        {{ form.student.label_tag }} {{ form.student }} {{ form.student.errors
+        }}
+      </p>
+
+      <button type="submit">Enroll</button>
+    </form>
+
+    <p><a href="{% url 'course-roster' course.pk %}">Back to roster</a></p>
+  </body>
+</html>

@@ -51,15 +51,22 @@ class User(AbstractUser):
 
 
 class Course(models.Model):
-    code = models.CharField(max_length=20, unique=True)
+    code = models.CharField(max_length=20)
     title = models.CharField(max_length=200)
     semester = models.PositiveSmallIntegerField()
     archived = models.BooleanField(default=False)
     faculty = models.ManyToManyField(User, related_name="taught_courses", limit_choices_to={"role": Role.FACULTY})
-    # A many-to-many row per (course, student) means enrolling twice still leaves one enrollment (FR-005).
     students = models.ManyToManyField(
         User, related_name="enrolled_courses", blank=True, limit_choices_to={"role": Role.STUDENT}
     )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["code", "semester"],
+                name="course_code_unique_per_semester",
+            )
+        ]
 
     def __str__(self):
         return f"{self.code} {self.title}"
