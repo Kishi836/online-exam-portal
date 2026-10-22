@@ -26,6 +26,21 @@ class CourseTests(TestCase):
             roll_number="PES1UG24CS001",
         )
 
+    def test_IT_009_admin_can_enroll_a_student(self):
+        course = self.make_course()
+        self.client.force_login(self.admin)
+
+        response = self.client.post(
+            f"/courses/{course.pk}/enroll/",
+            {"student": self.student.pk},
+            follow=True,
+        )
+
+        self.assertTrue(
+            course.students.filter(pk=self.student.pk).exists()
+        )
+        self.assertContains(response, self.student.email)
+
     def make_course(self, code="UE24CS351A", semester=5):
         course = Course.objects.create(
             code=code,
