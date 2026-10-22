@@ -1,12 +1,17 @@
 """Attempt Session Manager (SAD 3.1): starting an attempt and delivering its paper."""
+import math
+
 from django.core.exceptions import PermissionDenied
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from identity.access import roles
-from repository.models import Attempt, Exam, Role
+from repository.models import Attempt, Exam, Option, Role
+
+from . import services
+from .services import AttemptClosed, close_if_expired, expires_at
 
 
 class NotEligible(Exception):
@@ -23,7 +28,7 @@ def start(exam, student):
     if now >= exam.window_end:
         raise NotEligible("This examination has closed")
     attempt, _ = Attempt.objects.get_or_create(exam=exam, student=student)  # one row per student (DB constraint)
-    if attempt.submitted_at:
+    if close_if_expired(attempt).submitted_at:
         raise NotEligible("You have already submitted this examination")
     return attempt
 
@@ -51,5 +56,36 @@ def start_attempt(request):
 @roles(Role.STUDENT)
 def attempt_paper(request, pk):
     # Another student's attempt is a 404 too, so attempt ids reveal nothing.
-    attempt = get_object_or_404(Attempt, pk=pk, student=request.user, submitted_at__isnull=True)
-    return render(request, "attempts/paper.html", {"attempt": attempt, "questions": paper(attempt)})
+    attempt = close_if_expired(get_object_or_404(Attempt, pk=pk, student=request.user))
+    if attempt.submitted_at:
+        timed_out = attempt.submitted_at == expires_at(attempt)
+        return render(request, "attempts/submitted.html", {"attempt": attempt, "timed_out": timed_out})
+    saved = dict(attempt.answers.values_list("question_id", "option_id"))
+    questions = [{**q, "saved": saved.get(q["id"])} for q in paper(attempt)]
+    expires_in = math.ceil((expires_at(attempt) - timezone.now()).total_seconds())  # round up: never reload early
+    return render(request, "attempts/paper.html", {"attempt": attempt, "questions": questions, "expires_in": expires_in})
+
+
+@roles(Role.STUDENT)
+@require_POST
+def save_answer(request, pk):
+    """Each choice is saved the moment it is made, so expiry keeps everything answered up to then (UT_050)."""
+    attempt = get_object_or_404(Attempt, pk=pk, student=request.user)
+    question, option = request.POST.get("question", ""), request.POST.get("option", "")
+    if not (question.isdigit() and option.isdigit()):
+        return JsonResponse({"detail": "A question and an option are required."}, status=400)
+    try:
+        services.save_answer(attempt, int(question), int(option))
+    except AttemptClosed as refusal:
+        return JsonResponse({"detail": str(refusal)}, status=409)
+    except Option.DoesNotExist:
+        return JsonResponse({"detail": "That option does not belong to this question."}, status=400)
+    return JsonResponse({"saved": True})
+
+
+@roles(Role.STUDENT)
+@require_POST
+def submit_attempt(request, pk):
+    attempt = close_if_expired(get_object_or_404(Attempt, pk=pk, student=request.user))
+    services.submit(attempt)  # a no-op if expiry already submitted it
+    return redirect("attempt-paper", attempt.pk)
