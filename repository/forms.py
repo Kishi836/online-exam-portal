@@ -41,6 +41,7 @@ class CourseForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["title"].required = False
         self.fields["faculty"].queryset = User.objects.filter(
             role=Role.FACULTY
         )
