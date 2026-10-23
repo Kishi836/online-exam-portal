@@ -1,12 +1,37 @@
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
+from django.db import IntegrityError, transaction
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_GET, require_POST
 
 from repository.forms import CourseForm, EnrollmentForm
 from repository.models import Course, Role, User
 
-from .access import roles
+from .access import public, roles
+from .forms import RegistrationForm
+
+
+@public
+@sensitive_post_parameters("password1", "password2")
+def register(request):
+    """Create a Student account without ever accepting a role from the browser."""
+    form = RegistrationForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        try:
+            with transaction.atomic():
+                form.save()
+        except IntegrityError as error:
+            # Validation handles normal duplicates. This is the race-condition fallback.
+            message = str(error).lower()
+            if "roll_number" in message:
+                form.add_error("roll_number", "This roll number is already registered")
+            else:
+                form.add_error("email", "An account with this email already exists")
+        else:
+            messages.success(request, "Registration successful")
+            return redirect("login")
+    return render(request, "registration/register.html", {"form": form})
 
 
 @roles(*Role.values)

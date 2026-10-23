@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Question bank</title></head>
+<body>
+  <h1>Question bank</h1>
+  {% if messages %}{% for message in messages %}<p role="status">{{ message }}</p>{% endfor %}{% endif %}
+  <p><a href="{% url 'question-create' %}">Create question</a></p>
+  <ul>
+    {% for question in questions %}
+      <li>{{ question.course.code }} — {{ question.topic }} — {{ question.get_difficulty_display }} — +{{ question.positive_marks }} / -{{ question.negative_marks }}: {{ question.stem }}</li>
+    {% empty %}
+      <li>No questions have been created yet.</li>
+    {% endfor %}
+  </ul>
+</body>
+</html>
