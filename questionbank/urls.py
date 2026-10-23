@@ -1,2 +1,9 @@
-# Question Bank Manager (FR-007 -- FR-009). Every view needs @roles(...) from identity.access.
-urlpatterns = []
+from django.urls import path
+
+from . import views
+
+urlpatterns = [
+    path("faculty/questions/", views.question_list, name="question-list"),
+    path("faculty/questions/new/", views.question_create, name="question-create"),
+    path("api/questions", views.question_api, name="question-api"),
+]
