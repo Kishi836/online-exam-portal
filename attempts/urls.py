@@ -1,2 +1,7 @@
-# Attempt Session Manager (FR-015 -- FR-021, FR-029). Every view needs @roles(...) from identity.access.
-urlpatterns = []
+from django.urls import path
+
+from . import views
+
+urlpatterns = [
+    path("api/attempts/<int:attempt_id>/remaining", views.attempt_remaining, name="attempt-remaining"),
+]
