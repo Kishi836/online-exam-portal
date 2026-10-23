@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{{ heading }}</title>
+  </head>
+  <body>
+    <h1>{{ heading }}</h1>
+
+    <form method="post">
+      {% csrf_token %} {{ form.as_p }}
+      <button type="submit">Save Draft</button>
+    </form>
+
+    <p><a href="{% url 'exam-list' %}">Back to exams</a></p>
+  </body>
+</html>

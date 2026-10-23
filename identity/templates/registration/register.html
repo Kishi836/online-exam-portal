@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Student registration</title></head>
+<body>
+  <h1>Create your Student account</h1>
+  <form method="post">
+    {% csrf_token %}
+    {% if form.non_field_errors %}{{ form.non_field_errors }}{% endif %}
+    <p>
+      <label for="{{ form.full_name.id_for_label }}">Full name</label>
+      {{ form.full_name }}
+      {{ form.full_name.errors }}
+    </p>
+    <p>
+      <label for="{{ form.email.id_for_label }}">Institutional email address</label>
+      {{ form.email }}
+      {{ form.email.errors }}
+    </p>
+    <p>
+      <label for="{{ form.roll_number.id_for_label }}">Roll number</label>
+      {{ form.roll_number }}
+      {{ form.roll_number.errors }}
+    </p>
+    <p>
+      <label for="{{ form.password1.id_for_label }}">Password</label>
+      {{ form.password1 }}
+      {{ form.password1.errors }}
+    </p>
+    <p>
+      <label for="{{ form.password2.id_for_label }}">Confirm password</label>
+      {{ form.password2 }}
+      {{ form.password2.errors }}
+    </p>
+    <button type="submit">Register</button>
+  </form>
+  <p><a href="{% url 'login' %}">Sign in</a></p>
+</body>
+</html>

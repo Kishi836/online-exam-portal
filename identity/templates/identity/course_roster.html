@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Course Roster</title>
+  </head>
+  <body>
+    <h1>{{ course.code }} — {{ course.title }}</h1>
+    <p>Semester: {{ course.semester }}</p>
+    <p>Status: {% if course.archived %}Archived{% else %}Active{% endif %}</p>
+
+    {% if messages %} {% for message in messages %}
+    <p>{{ message }}</p>
+    {% endfor %} {% endif %} {% if not course.archived %}
+    <p><a href="{% url 'course-enroll' course.pk %}">Enroll a student</a></p>
+    {% endif %}
+
+    <h2>Enrolled students</h2>
+    {% if students %}
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for student in students %}
+        <tr>
+          <td>{{ student.full_name }}</td>
+          <td>{{ student.email }}</td>
+          <td>
+            {% if not course.archived %}
+            <form
+              method="post"
+              action="{% url 'course-unenroll' course.pk student.pk %}"
+            >
+              {% csrf_token %}
+              <button type="submit">Unenroll</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p>No students are enrolled in this course.</p>
+    {% endif %}
+
+    <p><a href="{% url 'faculty-courses' %}">Back to my courses</a></p>
+  </body>
+</html>

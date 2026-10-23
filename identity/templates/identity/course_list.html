@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Courses</title>
+  </head>
+  <body>
+    <h1>Courses</h1>
+
+    {% if messages %} {% for message in messages %}
+    <p>{{ message }}</p>
+    {% endfor %} {% endif %}
+
+    <p><a href="{% url 'course-create' %}">Create course</a></p>
+
+    {% if courses %}
+    <table>
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Title</th>
+          <th>Semester</th>
+          <th>Faculty</th>
+          <th>Students</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for course in courses %}
+        <tr>
+          <td>{{ course.code }}</td>
+          <td>{{ course.title }}</td>
+          <td>{{ course.semester }}</td>
+          <td>
+            {% for faculty_member in course.faculty.all %} {{
+            faculty_member.full_name }}{% if not forloop.last %}, {% endif %} {%
+            empty %} Unassigned {% endfor %}
+          </td>
+          <td>{{ course.students.count }}</td>
+          <td>{% if course.archived %}Archived{% else %}Active{% endif %}</td>
+          <td>
+            <a href="{% url 'course-edit' course.pk %}">Edit</a>
+            {% if not course.archived %}
+            <form method="post" action="{% url 'course-archive' course.pk %}">
+              {% csrf_token %}
+              <button type="submit">Archive</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p>No courses have been created yet.</p>
+    {% endif %}
+
+    <p><a href="{% url 'admin-dashboard' %}">Back to dashboard</a></p>
+  </body>
+</html>

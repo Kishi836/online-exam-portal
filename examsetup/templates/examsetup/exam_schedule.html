@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Schedule {{ exam.title }}</title>
+  </head>
+  <body>
+    <h1>Schedule {{ exam.title }}</h1>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      <p>
+        <label for="{{ form.window_start.id_for_label }}">Window start</label>
+        {{ form.window_start }}
+        {{ form.window_start.errors }}
+      </p>
+      <p>
+        <label for="{{ form.window_end.id_for_label }}">Window end</label>
+        {{ form.window_end }}
+        {{ form.window_end.errors }}
+      </p>
+      <button type="submit">Schedule examination</button>
+    </form>
+    <p><a href="{% url 'exam-detail' exam.id %}">Back to exam</a></p>
+  </body>
+</html>
