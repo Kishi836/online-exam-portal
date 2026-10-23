@@ -4,12 +4,12 @@ from django.core.exceptions import PermissionDenied
 from django.db.models import Max
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
-from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from identity.access import roles
 from repository.models import Exam, ExamQuestion, Role
 
-from .forms import ExamForm, ExamQuestionForm
+from .forms import ExamForm, ExamQuestionForm, ExamScheduleForm
 
 
 def _faculty_exam_or_403(request, exam_id):
@@ -164,3 +164,22 @@ def exam_publish(request, exam_id):
 
     messages.success(request, "Exam published.")
     return redirect("exam-detail", exam_id=exam.pk)
+
+
+@roles(Role.FACULTY)
+@require_http_methods(["GET", "POST"])
+def exam_schedule(request, exam_id):
+    exam = _faculty_exam_or_403(request, exam_id)
+    if exam.status != Exam.Status.PUBLISHED:
+        raise PermissionDenied("Only Published exams can be scheduled.")
+
+    if request.method == "POST":
+        form = ExamScheduleForm(request.POST, instance=exam)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Examination scheduled")
+            return redirect("exam-detail", exam_id=exam.pk)
+    else:
+        form = ExamScheduleForm(instance=exam)
+
+    return render(request, "examsetup/exam_schedule.html", {"exam": exam, "form": form})

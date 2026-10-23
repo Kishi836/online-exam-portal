@@ -25,4 +25,9 @@ urlpatterns = [
         views.exam_publish,
         name="exam-publish",
     ),
+    path(
+        "faculty/exams/<int:exam_id>/schedule/",
+        views.exam_schedule,
+        name="exam-schedule",
+    ),
 ]
