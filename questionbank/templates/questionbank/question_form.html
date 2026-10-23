@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Create question</title></head>
+<body>
+  <h1>Create a multiple-choice question</h1>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {% for field in form %}
+      <p>
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {{ field.errors }}
+      </p>
+    {% endfor %}
+    {{ option_formset.management_form }}
+    {{ option_formset.non_form_errors }}
+    <fieldset>
+      <legend>Options (enter between 2 and 6, with exactly one correct)</legend>
+      {% for option_form in option_formset %}
+        <p>
+          <label for="{{ option_form.text.id_for_label }}">Option {{ forloop.counter }}</label>
+          {{ option_form.text }}
+          {{ option_form.text.errors }}
+          <label for="{{ option_form.is_correct.id_for_label }}">Correct answer</label>
+          {{ option_form.is_correct }}
+          {{ option_form.is_correct.errors }}
+        </p>
+      {% endfor %}
+    </fieldset>
+    <button type="submit">Create question</button>
+  </form>
+  <p><a href="{% url 'question-list' %}">Back to question bank</a></p>
+</body>
+</html>

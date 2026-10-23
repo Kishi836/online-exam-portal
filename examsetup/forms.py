@@ -140,3 +140,32 @@ class ExamQuestionForm(forms.Form):
             )
 
         return ordered_questions
+
+
+class ExamScheduleForm(forms.ModelForm):
+    window_start = forms.DateTimeField(
+        input_formats=["%Y-%m-%dT%H:%M"],
+        widget=forms.DateTimeInput(
+            attrs={"type": "datetime-local"},
+            format="%Y-%m-%dT%H:%M",
+        ),
+    )
+    window_end = forms.DateTimeField(
+        input_formats=["%Y-%m-%dT%H:%M"],
+        widget=forms.DateTimeInput(
+            attrs={"type": "datetime-local"},
+            format="%Y-%m-%dT%H:%M",
+        ),
+    )
+
+    class Meta:
+        model = Exam
+        fields = ["window_start", "window_end"]
+
+    def clean(self):
+        cleaned_data = super().clean()
+        window_start = cleaned_data.get("window_start")
+        window_end = cleaned_data.get("window_end")
+        if window_start and window_end and window_end <= window_start:
+            self.add_error("window_end", "The window end must be later than the window start")
+        return cleaned_data

@@ -1,14 +1,66 @@
 
-from django.shortcuts import get_object_or_404, render
-from django.views.decorators.http import require_GET
+"""Student exam visibility and attempt session management."""
+
+import math
+
+from django.core.exceptions import PermissionDenied
+from django.http import Http404, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
+from django.views.decorators.http import require_GET, require_POST
 
 from identity.access import roles
-from repository.models import Exam, Role
+from repository.models import Attempt, Exam, Option, Role
+
+from . import services
+from .services import AttemptClosed, close_if_expired, expires_at
+
+
+class NotEligible(Exception):
+    """A start refused for a reason the Student is told (FR-015)."""
+
+
+def start(exam, student):
+    """Refuse ineligible students; otherwise return their server-created attempt."""
+    if (
+        exam.status != Exam.Status.PUBLISHED
+        or not exam.course.students.filter(pk=student.pk).exists()
+    ):
+        raise PermissionDenied
+
+    now = timezone.now()
+
+    if exam.window_start is None or exam.window_end is None or now < exam.window_start:
+        raise NotEligible("This examination has not opened yet")
+
+    if now >= exam.window_end:
+        raise NotEligible("This examination has closed")
+
+    attempt, _ = Attempt.objects.get_or_create(exam=exam, student=student)
+
+    if close_if_expired(attempt).submitted_at:
+        raise NotEligible("You have already submitted this examination")
+
+    return attempt
+
+
+def paper(attempt):
+    """Return exam questions and option text without exposing correct answers."""
+    questions = attempt.exam.questions.order_by("examquestion__order")
+    return [
+        {
+            "id": question.id,
+            "stem": question.stem,
+            "options": list(question.options.values("id", "text")),
+        }
+        for question in questions
+    ]
 
 
 @roles(Role.STUDENT)
 @require_GET
 def student_exam_list(request):
+    """Show published exams belonging to courses the student is enrolled in."""
     exams = (
         Exam.objects.filter(
             course__students=request.user,
@@ -28,16 +80,113 @@ def student_exam_list(request):
 @roles(Role.STUDENT)
 @require_GET
 def student_exam_detail(request, exam_id):
+    """Show an exam to enrolled students; forbid access by other students."""
     exam = get_object_or_404(
         Exam.objects.select_related("course").filter(
-            course__students=request.user,
             status=Exam.Status.PUBLISHED,
         ),
         pk=exam_id,
     )
+
+    if not exam.course.students.filter(pk=request.user.pk).exists():
+        raise PermissionDenied
 
     return render(
         request,
         "attempts/student_exam_detail.html",
         {"exam": exam},
     )
+
+
+@roles(Role.STUDENT)
+@require_POST
+def start_attempt(request):
+    exam_id = request.POST.get("exam", "")
+
+    if not exam_id.isdigit():
+        raise Http404
+
+    try:
+        attempt = start(get_object_or_404(Exam, pk=exam_id), request.user)
+    except NotEligible as refusal:
+        return render(
+            request,
+            "attempts/refused.html",
+            {"message": str(refusal)},
+            status=403,
+        )
+
+    return redirect("attempt-paper", attempt.pk)
+
+
+@roles(Role.STUDENT)
+def attempt_paper(request, pk):
+    """Deliver the student's attempt paper, or show its submitted state."""
+    attempt = close_if_expired(
+        get_object_or_404(Attempt, pk=pk, student=request.user)
+    )
+
+    if attempt.submitted_at:
+        timed_out = attempt.submitted_at == expires_at(attempt)
+        return render(
+            request,
+            "attempts/submitted.html",
+            {"attempt": attempt, "timed_out": timed_out},
+        )
+
+    saved = dict(attempt.answers.values_list("question_id", "option_id"))
+    questions = [
+        {**question, "saved": saved.get(question["id"])}
+        for question in paper(attempt)
+    ]
+    expires_in = math.ceil(
+        (expires_at(attempt) - timezone.now()).total_seconds()
+    )
+
+    return render(
+        request,
+        "attempts/paper.html",
+        {
+            "attempt": attempt,
+            "questions": questions,
+            "expires_in": expires_in,
+        },
+    )
+
+
+@roles(Role.STUDENT)
+@require_POST
+def save_answer(request, pk):
+    """Save each answer as it is selected."""
+    attempt = get_object_or_404(Attempt, pk=pk, student=request.user)
+    question = request.POST.get("question", "")
+    option = request.POST.get("option", "")
+
+    if not (question.isdigit() and option.isdigit()):
+        return JsonResponse(
+            {"detail": "A question and an option are required."},
+            status=400,
+        )
+
+    try:
+        services.save_answer(attempt, int(question), int(option))
+    except AttemptClosed as refusal:
+        return JsonResponse({"detail": str(refusal)}, status=409)
+    except Option.DoesNotExist:
+        return JsonResponse(
+            {"detail": "That option does not belong to this question."},
+            status=400,
+        )
+
+    return JsonResponse({"saved": True})
+
+
+@roles(Role.STUDENT)
+@require_POST
+def submit_attempt(request, pk):
+    """Submit an attempt, or leave an already-expired attempt closed."""
+    attempt = close_if_expired(
+        get_object_or_404(Attempt, pk=pk, student=request.user)
+    )
+    services.submit(attempt)
+    return redirect("attempt-paper", attempt.pk)
