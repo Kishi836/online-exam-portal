@@ -1,0 +1,3 @@
+{% load static %}
+<span id="timer" data-remaining="{{ remaining }}" data-remaining-url="{{ remaining_url }}" aria-live="polite"></span>
+<script src="{% static 'attempts/timer.js' %}" defer></script>
