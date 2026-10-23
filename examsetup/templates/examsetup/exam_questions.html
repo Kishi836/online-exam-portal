@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Add Questions</title>
+  </head>
+  <body>
+    <h1>Add Questions to {{ exam.title }}</h1>
+    <p>Select questions in the order you want them to appear.</p>
+
+    <form method="post">
+      {% csrf_token %} {{ form.as_p }}
+      <button type="submit">Add Selected Questions</button>
+    </form>
+
+    <p><a href="{% url 'exam-detail' exam.id %}">Back to exam</a></p>
+  </body>
+</html>

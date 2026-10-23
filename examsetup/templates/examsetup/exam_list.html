@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>My Exams</title>
+  </head>
+  <body>
+    <h1>My Exams</h1>
+
+    <p><a href="{% url 'exam-create' %}">Create New Exam</a></p>
+
+    {% if exams %}
+    <ul>
+      {% for exam in exams %}
+      <li>
+        <a href="{% url 'exam-detail' exam.id %}"> {{ exam.title }} </a>
+        — {{ exam.course.code }} — {{ exam.get_status_display }}
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>No exams created yet.</p>
+    {% endif %}
+  </body>
+</html>
