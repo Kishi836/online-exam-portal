@@ -64,6 +64,7 @@ AUTH_USER_MODEL = "repository.User"
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "login"
+STUDENT_EMAIL_DOMAIN = "pesu.pes.edu"
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "Asia/Kolkata"
