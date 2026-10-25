@@ -10,7 +10,8 @@ urlpatterns = [
     path("django-admin/", admin.site.urls),
     path(
         "login/",
-        public(auth_views.LoginView.as_view(authentication_form=EmailLoginForm)),
+        public(auth_views.LoginView.as_view(
+            authentication_form=EmailLoginForm)),
         name="login",
     ),
     path("logout/", public(auth_views.LogoutView.as_view()), name="logout"),
@@ -19,3 +20,7 @@ urlpatterns = [
     path("", include("examsetup.urls")),
     path("", include("attempts.urls")),
 ]
+handler400 = "portal.error_handlers.bad_request"
+handler403 = "portal.error_handlers.permission_denied"
+handler404 = "portal.error_handlers.page_not_found"
+handler500 = "portal.error_handlers.server_error"
