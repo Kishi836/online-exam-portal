@@ -5,6 +5,7 @@
     <title>Schedule {{ exam.title }}</title>
   </head>
   <body>
+    {% include "_nav.html" %}
     <h1>Schedule {{ exam.title }}</h1>
     <form method="post">
       {% csrf_token %}
