@@ -15,6 +15,12 @@
     <p><strong>Pass mark:</strong> {{ exam.pass_mark_percent }}%</p>
     <p><strong>Instructions:</strong> {{ exam.instructions|default:"None" }}</p>
 
+    <form method="post" action="{% url 'attempt-start' %}">
+      {% csrf_token %}
+      <input type="hidden" name="exam" value="{{ exam.pk }}" />
+      <button type="submit">Start exam</button>
+    </form>
+
     <p><a href="{% url 'student-exam-list' %}">Back to available exams</a></p>
   </body>
 </html>
