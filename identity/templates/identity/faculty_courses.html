@@ -12,8 +12,8 @@
     <ul>
       {% for course in courses %}
       <li>
-        <strong>{{ course.code }}</strong> — {{ course.title }} (Semester {{
-        course.semester }}) {% if course.archived %}
+        <strong>{{ course.code }}</strong> — {{ course.title }}
+        (Semester {{ course.semester }}) {% if course.archived %}
         <span>Archived</span>
         {% else %}
         <span>Active</span>

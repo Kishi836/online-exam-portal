@@ -21,16 +21,16 @@
     <p><strong>Pass mark:</strong> {{ exam.pass_mark_percent }}%</p>
     <p><strong>Instructions:</strong> {{ exam.instructions|default:"None" }}</p>
     <p>
-      <strong>Negative marking:</strong> {{
-      exam.negative_marking|yesno:"Enabled,Disabled" }}
+      <strong>Negative marking:</strong>
+      {{ exam.negative_marking|yesno:"Enabled,Disabled" }}
     </p>
     <p>
-      <strong>Shuffle questions:</strong> {{
-      exam.shuffle_questions|yesno:"Yes,No" }}
+      <strong>Shuffle questions:</strong>
+      {{ exam.shuffle_questions|yesno:"Yes,No" }}
     </p>
     <p>
-      <strong>Shuffle options:</strong> {{ exam.shuffle_options|yesno:"Yes,No"
-      }}
+      <strong>Shuffle options:</strong>
+      {{ exam.shuffle_options|yesno:"Yes,No" }}
     </p>
     {% if exam.window_start and exam.window_end %}
     <p><strong>Window start:</strong> {{ exam.window_start|localtime|date:"Y-m-d H:i T" }}</p>
