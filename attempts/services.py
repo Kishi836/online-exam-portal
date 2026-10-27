@@ -29,6 +29,12 @@ def expires_at(attempt):
     return attempt.started_at + timedelta(minutes=attempt.exam.duration_minutes)
 
 
+def remaining_seconds(attempt, now=None):
+    """FR-017: non-negative time remaining from the server clock."""
+    current_time = now or timezone.now()
+    return max(0, int((expires_at(attempt) - current_time).total_seconds()))
+
+
 def close_if_expired(attempt):
     """FR-020: submit an overdue attempt, stamped at its expiry rather than whenever it was noticed (UT_052).
 

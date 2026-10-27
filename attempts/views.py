@@ -13,7 +13,7 @@ from identity.access import roles
 from repository.models import Attempt, Exam, Option, Role
 
 from . import services
-from .services import AttemptClosed, close_if_expired, expires_at
+from .services import AttemptClosed, close_if_expired, expires_at, remaining_seconds
 
 
 class NotEligible(Exception):
@@ -152,6 +152,13 @@ def attempt_paper(request, pk):
             "expires_in": expires_in,
         },
     )
+
+
+@roles(Role.STUDENT)
+def attempt_remaining(request, pk):
+    attempt = get_object_or_404(Attempt.objects.select_related("exam"), pk=pk, student=request.user)
+    attempt = close_if_expired(attempt)
+    return JsonResponse({"remaining_seconds": remaining_seconds(attempt)})
 
 
 @roles(Role.STUDENT)

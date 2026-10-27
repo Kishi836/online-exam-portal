@@ -24,4 +24,5 @@ urlpatterns = [
     path("attempts/<int:pk>/submit", views.submit_attempt, name="attempt-submit"),
     path("api/attempts/<int:pk>/answers",
          views.save_answer, name="attempt-answer"),
+    path("api/attempts/<int:pk>/remaining", views.attempt_remaining, name="attempt-remaining"),
 ]

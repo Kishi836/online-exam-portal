@@ -4,6 +4,8 @@
 <body>
   <h1>{{ attempt.exam.title }}</h1>
   <p>Started at {{ attempt.started_at|time:"H:i" }} &middot; {{ attempt.exam.duration_minutes }} minutes</p>
+  {% url 'attempt-remaining' attempt.pk as remaining_url %}
+  {% include "attempts/_timer.html" with remaining=expires_in remaining_url=remaining_url %}
   <form id="paper" method="post" action="{% url 'attempt-submit' attempt.pk %}"
         data-answers="{% url 'attempt-answer' attempt.pk %}" data-expires-in="{{ expires_in }}">
     {% csrf_token %}
