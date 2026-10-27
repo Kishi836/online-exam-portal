@@ -13,8 +13,8 @@
       {% for exam in exams %}
       <li>
         <a href="{% url 'student-exam-detail' exam.id %}"> {{ exam.title }} </a>
-        — {{ exam.course.code }} {{ exam.course.title }} — {{
-        exam.duration_minutes }} minutes
+        — {{ exam.course.code }} {{ exam.course.title }} —
+        {{ exam.duration_minutes }} minutes
       </li>
       {% endfor %}
     </ul>

@@ -34,9 +34,9 @@
           <td>{{ course.title }}</td>
           <td>{{ course.semester }}</td>
           <td>
-            {% for faculty_member in course.faculty.all %} {{
-            faculty_member.full_name }}{% if not forloop.last %}, {% endif %} {%
-            empty %} Unassigned {% endfor %}
+            {% for faculty_member in course.faculty.all %}
+            {{ faculty_member.full_name }}{% if not forloop.last %}, {% endif %}
+            {% empty %} Unassigned {% endfor %}
           </td>
           <td>{{ course.students.count }}</td>
           <td>{% if course.archived %}Archived{% else %}Active{% endif %}</td>
