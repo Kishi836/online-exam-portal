@@ -2,6 +2,7 @@
 <html lang="en">
 <head><meta charset="utf-8"><title>{{ attempt.exam.title }}</title></head>
 <body>
+  {% include "_nav.html" %}
   <h1>{{ attempt.exam.title }}</h1>
   <p>Started at {{ attempt.started_at|time:"H:i" }} &middot; {{ attempt.exam.duration_minutes }} minutes</p>
   {% url 'attempt-remaining' attempt.pk as remaining_url %}
