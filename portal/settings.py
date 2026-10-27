@@ -6,7 +6,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # NFR-014: no secret lives in the repository; without the variable the app refuses to start.
 SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 DEBUG = os.environ.get("DJANGO_DEBUG") == "1"
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+ALLOWED_HOSTS = os.environ.get(
+    "DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1"
+).split(",")
 
 # One app per Business component (SAD 3.1); `repository` is the Data layer and holds every model.
 INSTALLED_APPS = [
@@ -41,7 +43,7 @@ WSGI_APPLICATION = "portal.wsgi.application"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "portal" / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
