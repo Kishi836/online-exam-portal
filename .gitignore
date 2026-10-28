@@ -29,6 +29,7 @@ target/
 
 # Local database
 db.sqlite3
+db.sqlite3-*
 
 # Logs / coverage / test output
 *.log

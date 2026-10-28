@@ -9,11 +9,15 @@ Quick test:
     python manage.py runserver 127.0.0.1:8001 --insecure
     python -m locust -f loadtest/locustfile.py --host http://127.0.0.1:8001 --headless -u 5 -r 2 -t 30s --html loadtest/report-smoke.html
 
-Full run (runserver --insecure keeps DEBUG off, the default):
+Full run: under Gunicorn as deployed (SAD 5), not runserver, whose 5-connection backlog refuses
+connections at 200 users. Gunicorn needs Linux; on Windows run the server in WSL with the project on
+the Linux filesystem (SQLite's WAL does not work over /mnt/c):
     python manage.py seed_bank
-    python -m locust -f loadtest/locustfile.py --host http://127.0.0.1:8001 --headless -u 200 -r 20 -t 5m --html loadtest/report.html
+    gunicorn portal.wsgi:application -b 0.0.0.0:8001 --workers 25        # 2 x cores + 1
+    python -m locust -f loadtest/locustfile.py --host http://127.0.0.1:8001 --headless -u 200 -r 20 -t 5m --reset-stats --html loadtest/report.html
 
-Pass: the 95th percentile of every request is 2 s or less (NFR-001), with the 50,000-question bank seeded (NFR-003).
+Pass: the aggregate 95th percentile is 2 s or less (NFR-001) with the 50,000-question bank seeded (NFR-003).
+--reset-stats starts counting once all 200 users are in, i.e. "while 200 attempts are active".
 Keep HTML reports out of Git; put the full-run report in the PR description.
 """
 import itertools
