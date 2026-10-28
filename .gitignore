@@ -36,6 +36,7 @@ coverage/
 .coverage
 htmlcov/
 .pytest_cache/
+loadtest/report*.html
 
 # Local tooling
 .claude/
