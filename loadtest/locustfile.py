@@ -1,4 +1,3 @@
-
 """NFR-001 / NFR-003 load test: seeded Students sign in, take the exam, and submit.
 
 Install Locust:
@@ -10,7 +9,11 @@ Quick test:
     python manage.py runserver 127.0.0.1:8001 --insecure
     python -m locust -f loadtest/locustfile.py --host http://127.0.0.1:8001 --headless -u 5 -r 2 -t 30s --html loadtest/report-smoke.html
 
-The full 50,000-question / 200-user run is for Thursday.
+Full run (runserver --insecure keeps DEBUG off, the default):
+    python manage.py seed_bank
+    python -m locust -f loadtest/locustfile.py --host http://127.0.0.1:8001 --headless -u 200 -r 20 -t 5m --html loadtest/report.html
+
+Pass: the 95th percentile of every request is 2 s or less (NFR-001), with the 50,000-question bank seeded (NFR-003).
 Keep HTML reports out of Git; put the full-run report in the PR description.
 """
 import itertools
@@ -36,7 +39,7 @@ class Student(HttpUser):
         self.csrf_token = None
 
         # Fetch login page and its CSRF cookie.
-        login_page = self.client.get("/login/", name="login page")
+        self.client.get("/login/", name="login page")
         self.csrf_token = self.client.cookies.get("csrftoken")
 
         if not self.csrf_token:
