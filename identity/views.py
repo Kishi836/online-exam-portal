@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_GET, require_POST
 
+from attempts.services import dashboard_groups
 from repository.forms import CourseForm, EnrollmentForm
 from repository.models import Course, Role, User
 
@@ -39,10 +40,13 @@ def home(request):
     return redirect(f"{request.user.role.lower()}-dashboard")
 
 
-# Placeholder dashboards so each role has a landing page; the real ones are FR-014 and the consoles.
 @roles(Role.STUDENT)
 def student_dashboard(request):
-    return render(request, "identity/dashboard.html")
+    """FR-014: the tiles plus the Student's exams grouped as Upcoming / Live / Completed."""
+    return render(request, "identity/dashboard.html", {"groups": dashboard_groups(request.user)})
+
+
+# Placeholder dashboards so each role has a landing page; the real ones are the consoles.
 
 
 @roles(Role.FACULTY)

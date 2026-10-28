@@ -64,5 +64,37 @@
       </a>
       {% endif %}
     </div>
+
+    {% if user.role == "STUDENT" %}
+    {# FR-014: the three groups sit below the tiles. `groups` comes from attempts.services.dashboard_groups. #}
+    <section aria-labelledby="live-heading">
+      <h2 id="live-heading">Live</h2>
+      {% for exam in groups.live %}
+        {# TODO(Kartik): title, course code, "closes at" time, and the Start form copied from #}
+        {# attempts/templates/attempts/student_exam_detail.html (POST to 'attempt-start', hidden "exam" field). #}
+      {% empty %}
+        <p class="muted">No exam is open right now.</p>
+      {% endfor %}
+    </section>
+
+    <section aria-labelledby="upcoming-heading">
+      <h2 id="upcoming-heading">Upcoming</h2>
+      {% for exam in groups.upcoming %}
+        {# TODO(Kartik): title, course code and the start date-time ("Not scheduled yet" when window_start is empty). #}
+        {# No Start button here (UT_036). #}
+      {% empty %}
+        <p class="muted">Nothing scheduled.</p>
+      {% endfor %}
+    </section>
+
+    <section aria-labelledby="completed-heading">
+      <h2 id="completed-heading">Completed</h2>
+      {% for exam in groups.completed %}
+        {# TODO(Kartik): title and course code. No Start button and no score: results wait for FR-025. #}
+      {% empty %}
+        <p class="muted">No completed exams yet.</p>
+      {% endfor %}
+    </section>
+    {% endif %}
   </body>
 </html>
