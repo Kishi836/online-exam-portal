@@ -6,7 +6,24 @@ from django.test import SimpleTestCase, TestCase
 from attempts.services import submit
 from repository.models import Answer, Attempt, Course, Exam, ExamQuestion, Option, Question, Role, User
 
-from .engine import evaluate, marks_for
+from .engine import evaluate, marks_for, outcome
+
+
+class OutcomeTests(SimpleTestCase):
+    """UT_057, UT_058 -- FR-024 against a declared total of 50 and a 40% pass mark."""
+
+    def test_UT_057_score_exactly_at_the_pass_mark_is_a_pass(self):
+        self.assertEqual(outcome(Decimal("20"), Decimal("50"), Decimal("40")), (Decimal("40.00"), True))
+
+    def test_UT_058_score_just_below_the_pass_mark_is_a_fail(self):
+        self.assertEqual(outcome(Decimal("19.5"), Decimal("50"), Decimal("40")), (Decimal("39.00"), False))
+
+    def test_FR_024_rounding_the_percentage_never_flips_a_fail_to_pass(self):
+        # 39.995% rounds to 40.00 for display but is still below a 40% pass mark.
+        self.assertEqual(outcome(Decimal("79.99"), Decimal("200"), Decimal("40")), (Decimal("40.00"), False))
+
+    def test_FR_024_zero_declared_total_has_no_outcome_instead_of_crashing(self):
+        self.assertEqual(outcome(Decimal("0"), Decimal("0"), Decimal("40")), (None, None))
 
 
 class MarkingRuleTests(SimpleTestCase):
@@ -71,6 +88,8 @@ class EvaluationTests(TestCase):
         submit(attempt)
         attempt.refresh_from_db()
         self.assertEqual(attempt.score, Decimal("10.5"))
+        self.assertEqual(attempt.percentage, Decimal("52.5"))
+        self.assertIs(attempt.passed, True)
 
     def test_question_with_no_answer_row_counts_as_unanswered(self):
         exam, options = self.make_exam(3)
