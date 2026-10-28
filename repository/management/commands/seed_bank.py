@@ -94,14 +94,14 @@ class Command(BaseCommand):
         self.stdout.write(f"{len(bank)} questions ready")
 
         # Ensure every seeded question has four options.
-        # Reuse questions that already have options.
+        # Reuse questions that already have options (one query, not one per question).
+        has_options = set(
+            Option.objects.filter(question__course=course)
+            .values_list("question_id", flat=True)
+        )
         all_options = []
         for question in bank:
-            existing_options = Option.objects.filter(
-                question=question
-            ).count()
-
-            if existing_options == 0:
+            if question.id not in has_options:
                 all_options.extend(
                     [
                         Option(
@@ -139,7 +139,6 @@ class Command(BaseCommand):
 
         # Reuse existing load-test users; create only missing users.
         password_hash = make_password(STUDENT_PASSWORD)
-        the_students = []
 
         for i in range(1, students + 1):
             email = f"load.student{i}@pesu.pes.edu"
@@ -155,9 +154,7 @@ class Command(BaseCommand):
                 },
             )
 
-            if created:
-                the_students.append(student)
-            elif student.role != Role.STUDENT:
+            if not created and student.role != Role.STUDENT:
                 raise CommandError(
                     f"{email} exists but is not a Student account."
                 )
