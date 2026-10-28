@@ -28,13 +28,16 @@ def start(exam, student):
     ):
         raise PermissionDenied
 
-    now = timezone.now()
+    # FR-021: the window gates only a new attempt. One already started resumes until its own expiry,
+    # even if the window has closed since.
+    if not Attempt.objects.filter(exam=exam, student=student).exists():
+        now = timezone.now()
 
-    if exam.window_start is None or exam.window_end is None or now < exam.window_start:
-        raise NotEligible("This examination has not opened yet")
+        if exam.window_start is None or exam.window_end is None or now < exam.window_start:
+            raise NotEligible("This examination has not opened yet")
 
-    if now >= exam.window_end:
-        raise NotEligible("This examination has closed")
+        if now >= exam.window_end:
+            raise NotEligible("This examination has closed")
 
     attempt, _ = Attempt.objects.get_or_create(exam=exam, student=student)
 
