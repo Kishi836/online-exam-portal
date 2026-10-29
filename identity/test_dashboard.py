@@ -35,25 +35,34 @@ class DashboardTests(TestCase):
 
     def test_UT_036_exam_starting_tomorrow_is_upcoming_without_start_button(self):
         exam = self.make_exam(timedelta(hours=24), timedelta(hours=26))
-        # TODO(Kartik): assert dashboard_groups(self.student)["upcoming"] == [exam],
-        # then GET reverse("student-dashboard") and assert the start date-time is shown
-        # and there is no "Start exam" button on the page.
-        self.skipTest("TODO(Kartik): UT_036")
+        self.assertEqual(dashboard_groups(self.student)["upcoming"], [exam])
+        response = self.client.get(reverse("student-dashboard"))
+        self.assertContains(response, timezone.localtime(exam.window_start).strftime("%Y-%m-%d %H:%M"))
+        self.assertNotContains(response, "Start exam")
 
     def test_UT_037_open_window_is_live_with_start_button(self):
         exam = self.make_exam(timedelta(minutes=-10), timedelta(minutes=50))
-        # TODO(Kartik): assert it is in groups["live"], and the page has a form posting to reverse("attempt-start").
-        self.skipTest("TODO(Kartik): UT_037")
+        self.assertEqual(dashboard_groups(self.student)["live"], [exam])
+        response = self.client.get(reverse("student-dashboard"))
+        self.assertContains(response, f'action="{reverse("attempt-start")}"')
+        self.assertContains(response, f'name="exam" value="{exam.pk}"')
+        self.assertContains(response, "Start exam")
 
     def test_UT_038_submitted_exam_is_completed_without_start_button(self):
         exam = self.make_exam(timedelta(minutes=-10), timedelta(minutes=50))
         Attempt.objects.create(exam=exam, student=self.student, submitted_at=timezone.now())
-        # TODO(Kartik): assert it is in groups["completed"] (not "live"), and no "Start exam" button.
-        self.skipTest("TODO(Kartik): UT_038")
+        groups = dashboard_groups(self.student)
+        self.assertEqual(groups["completed"], [exam])
+        self.assertEqual(groups["live"], [])
+        response = self.client.get(reverse("student-dashboard"))
+        self.assertContains(response, exam.title)
+        self.assertNotContains(response, "Start exam")
 
     def test_IT_018_classification_uses_server_time_not_client_clock(self):
         exam = self.make_exam(timedelta(hours=1), timedelta(hours=3))
-        # TODO(Kartik): the client can't send a time, so a "+2 h client clock" changes nothing.
-        # GET the dashboard with a spoofed header, e.g. HTTP_DATE set two hours ahead,
-        # and assert the exam is still under Upcoming.
-        self.skipTest("TODO(Kartik): IT_018")
+        response = self.client.get(
+            reverse("student-dashboard"),
+            HTTP_DATE=(timezone.now() + timedelta(hours=2)).isoformat(),
+        )
+        self.assertEqual(response.context["groups"]["upcoming"], [exam])
+        self.assertEqual(response.context["groups"]["live"], [])

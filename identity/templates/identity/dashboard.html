@@ -70,8 +70,16 @@
     <section aria-labelledby="live-heading">
       <h2 id="live-heading">Live</h2>
       {% for exam in groups.live %}
-        {# TODO(Kartik): title, course code, "closes at" time, and the Start form copied from #}
-        {# attempts/templates/attempts/student_exam_detail.html (POST to 'attempt-start', hidden "exam" field). #}
+        <article>
+          <h3>{{ exam.title }}</h3>
+          <p>{{ exam.course.code }}</p>
+          <p>Closes at {{ exam.window_end|date:"Y-m-d H:i" }}</p>
+          <form method="post" action="{% url 'attempt-start' %}">
+            {% csrf_token %}
+            <input type="hidden" name="exam" value="{{ exam.pk }}" />
+            <button type="submit">Start exam</button>
+          </form>
+        </article>
       {% empty %}
         <p class="muted">No exam is open right now.</p>
       {% endfor %}
@@ -80,8 +88,15 @@
     <section aria-labelledby="upcoming-heading">
       <h2 id="upcoming-heading">Upcoming</h2>
       {% for exam in groups.upcoming %}
-        {# TODO(Kartik): title, course code and the start date-time ("Not scheduled yet" when window_start is empty). #}
-        {# No Start button here (UT_036). #}
+        <article>
+          <h3>{{ exam.title }}</h3>
+          <p>{{ exam.course.code }}</p>
+          {% if exam.window_start %}
+            <p>Starts at {{ exam.window_start|date:"Y-m-d H:i" }}</p>
+          {% else %}
+            <p>Not scheduled yet</p>
+          {% endif %}
+        </article>
       {% empty %}
         <p class="muted">Nothing scheduled.</p>
       {% endfor %}
@@ -90,7 +105,10 @@
     <section aria-labelledby="completed-heading">
       <h2 id="completed-heading">Completed</h2>
       {% for exam in groups.completed %}
-        {# TODO(Kartik): title and course code. No Start button and no score: results wait for FR-025. #}
+        <article>
+          <h3>{{ exam.title }}</h3>
+          <p>{{ exam.course.code }}</p>
+        </article>
       {% empty %}
         <p class="muted">No completed exams yet.</p>
       {% endfor %}

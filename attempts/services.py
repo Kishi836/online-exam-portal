@@ -78,7 +78,14 @@ def dashboard_groups(student, now=None):
         Attempt.objects.filter(student=student, submitted_at__isnull=False).values_list("exam_id", flat=True)
     )
     for exam in visible_exams(student).order_by("window_start", "title"):
-        # TODO(Kartik): put `exam` into exactly one of the three lists, using the rules in the docstring.
-        # Check "submitted" first: a submitted exam is Completed even while its window is still open (UT_038).
-        pass
+        if exam.id in submitted:
+            groups["completed"].append(exam)
+        elif exam.window_start is None or exam.window_end is None:
+            groups["upcoming"].append(exam)
+        elif now < exam.window_start:
+            groups["upcoming"].append(exam)
+        elif now >= exam.window_end:
+            groups["completed"].append(exam)
+        else:
+            groups["live"].append(exam)
     return groups
