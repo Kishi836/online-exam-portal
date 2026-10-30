@@ -24,6 +24,11 @@ def submit(attempt, at=None):
     attempt.refresh_from_db()
 
 
+def result_visible(attempt):
+    """FR-025: a Student sees a score only once the attempt is submitted and Faculty has published results."""
+    return attempt.submitted_at is not None and attempt.exam.results_published
+
+
 def expires_at(attempt):
     """FR-020: the server-stamped start plus the exam's duration; nothing from the client enters it."""
     return attempt.started_at + timedelta(minutes=attempt.exam.duration_minutes)

@@ -19,6 +19,8 @@ urlpatterns = [
     path("", include("questionbank.urls")),
     path("", include("examsetup.urls")),
     path("", include("attempts.urls")),
+    path("", include("results.urls")),
+    path("", include("integrity.urls")),
 ]
 handler400 = "portal.error_handlers.bad_request"
 handler403 = "portal.error_handlers.permission_denied"

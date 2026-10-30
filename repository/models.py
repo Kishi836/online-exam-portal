@@ -33,6 +33,7 @@ class User(AbstractUser):
     full_name = models.CharField(max_length=150)
     roll_number = models.CharField(max_length=20, unique=True, null=True, blank=True)  # Students only
     role = models.CharField(max_length=7, choices=Role.choices)
+    consent_given_at = models.DateTimeField(null=True, blank=True)  # NFR-008: DPDP consent at registration
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["full_name"]
@@ -81,6 +82,12 @@ class Question(models.Model):
     positive_marks = models.DecimalField(max_digits=5, decimal_places=2)
     negative_marks = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     created_by = models.ForeignKey(User, on_delete=models.PROTECT, related_name="questions")
+    # FR-009: editing a question in use makes a new row; the old one is kept, unchanged, and retired from the bank.
+    version = models.PositiveIntegerField(default=1)
+    previous = models.OneToOneField(
+        "self", on_delete=models.PROTECT, null=True, blank=True, related_name="next_version"
+    )
+    retired = models.BooleanField(default=False)
 
     def __str__(self):
         return self.stem[:60]
@@ -113,6 +120,7 @@ class Exam(models.Model):
     published_at = models.DateTimeField(null=True, blank=True)
     window_start = models.DateTimeField(null=True, blank=True)
     window_end = models.DateTimeField(null=True, blank=True)
+    results_published = models.BooleanField(default=False)  # FR-025/026
     questions = models.ManyToManyField(Question, through="ExamQuestion", related_name="exams")
 
     def __str__(self):
@@ -147,6 +155,40 @@ class Answer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.PROTECT)
     option = models.ForeignKey(Option, on_delete=models.PROTECT, null=True, blank=True)  # null = unanswered
     saved_at = models.DateTimeField(auto_now=True)
+    # FR-018: a row with no option is a visited, unanswered question; no row at all is Not Visited.
+    marked_for_review = models.BooleanField(default=False)
+    marks = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)  # FR-027, set on evaluation
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=["attempt", "question"], name="one_answer_per_question")]
+
+
+class FocusEvent(models.Model):
+    """FR-028: the exam window lost focus. The time is the server's; the browser sends none."""
+
+    attempt = models.ForeignKey(Attempt, on_delete=models.PROTECT, related_name="focus_events")
+    occurred_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["occurred_at", "id"]
+
+
+class SignInFailure(models.Model):
+    """NFR-012: one row per failed sign-in, keyed by the email typed, whether or not that account exists."""
+
+    email = models.CharField(max_length=254, db_index=True)
+    at = models.DateTimeField(auto_now_add=True)
+
+
+class AuditEntry(models.Model):
+    """FR-030: who did what to which entity, when, and the values before and after."""
+
+    actor = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)  # null = the system itself
+    action = models.CharField(max_length=40)
+    entity = models.CharField(max_length=40)
+    entity_id = models.PositiveBigIntegerField()
+    changes = models.JSONField(default=dict, blank=True)
+    at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-at", "-id"]
