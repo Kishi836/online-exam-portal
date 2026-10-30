@@ -1,6 +1,8 @@
 """Evaluation Engine (SAD 3.1): IEvaluation, called by the Attempt Session Manager on submission."""
 from decimal import ROUND_HALF_UP, Decimal
 
+from repository.models import Answer
+
 
 def marks_for(question, option, negative_marking):
     """FR-023: full positive marks if correct, minus the configured negative marks if wrong, zero if unanswered."""
@@ -26,10 +28,11 @@ def outcome(score, total_marks, pass_mark_percent):
 def evaluate(attempt):
     """FR-022: score the attempt and store it. A question with no Answer row is unanswered and adds nothing."""
     exam = attempt.exam
-    attempt.score = sum(
-        (marks_for(a.question, a.option, exam.negative_marking) for a in attempt.answers.select_related("question", "option")),
-        Decimal("0"),
-    )
+    answers = list(attempt.answers.select_related("question", "option"))
+    for answer in answers:
+        answer.marks = marks_for(answer.question, answer.option, exam.negative_marking)  # FR-027 reads these
+    Answer.objects.bulk_update(answers, ["marks"])  # one query, whatever the paper size (NFR-002)
+    attempt.score = sum((a.marks for a in answers), Decimal("0"))
     # NFR-010: the pass mark comes from the exam, never from code.
     attempt.percentage, attempt.passed = outcome(attempt.score, exam.total_marks, exam.pass_mark_percent)
     attempt.save(update_fields=["score", "percentage", "passed"])
