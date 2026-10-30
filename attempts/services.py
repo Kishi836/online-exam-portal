@@ -5,7 +5,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from evaluation.engine import evaluate
-from repository.models import Answer, Attempt, Option
+from repository.models import Answer, Attempt, Exam, Option
 
 
 class AttemptClosed(Exception):
@@ -61,3 +61,36 @@ def save_answer(attempt, question_id, option_id):
         raise AttemptClosed("This attempt has already been submitted")
     option = Option.objects.get(pk=option_id, question_id=question_id, question__exams=attempt.exam)
     Answer.objects.update_or_create(attempt=attempt, question_id=question_id, defaults={"option": option})
+
+
+def visible_exams(student):
+    """FR-006: the published exams of the courses this Student is enrolled in. The one place this rule lives."""
+    return Exam.objects.filter(course__students=student, status=Exam.Status.PUBLISHED).select_related("course")
+
+
+def dashboard_groups(student, now=None):
+    """FR-014: the Student's visible exams split into Upcoming, Live and Completed, by server time only.
+
+    - Upcoming: no window yet, or server time is before window_start.
+    - Live: the window is open and the Student has no submitted attempt.
+    - Completed: the Student has submitted, or the window has ended.
+
+    `now` is for tests; the dashboard passes nothing, so the server clock decides (IT_018).
+    """
+    now = now or timezone.now()
+    groups = {"upcoming": [], "live": [], "completed": []}
+    submitted = set(
+        Attempt.objects.filter(student=student, submitted_at__isnull=False).values_list("exam_id", flat=True)
+    )
+    for exam in visible_exams(student).order_by("window_start", "title"):
+        if exam.id in submitted:
+            groups["completed"].append(exam)
+        elif exam.window_start is None or exam.window_end is None:
+            groups["upcoming"].append(exam)
+        elif now < exam.window_start:
+            groups["upcoming"].append(exam)
+        elif now >= exam.window_end:
+            groups["completed"].append(exam)
+        else:
+            groups["live"].append(exam)
+    return groups

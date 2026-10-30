@@ -64,14 +64,7 @@ def paper(attempt):
 @require_GET
 def student_exam_list(request):
     """Show published exams belonging to courses the student is enrolled in."""
-    exams = (
-        Exam.objects.filter(
-            course__students=request.user,
-            status=Exam.Status.PUBLISHED,
-        )
-        .select_related("course")
-        .order_by("title")
-    )
+    exams = services.visible_exams(request.user).order_by("title")
 
     return render(
         request,
