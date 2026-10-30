@@ -5,7 +5,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from evaluation.engine import evaluate
-from repository.models import Answer, Attempt, Exam, Option
+from repository.models import Answer, Attempt, Exam
 
 
 class AttemptClosed(Exception):
@@ -52,15 +52,19 @@ def close_if_expired(attempt):
     return attempt
 
 
-def save_answer(attempt, question_id, option_id):
-    """Store the Student's choice for one question; refused once the attempt is submitted or out of time.
+def save_answer(attempt, question_id, option_id, marked_for_review=None):
+    """FR-019: store, change or clear (option_id None) one response; refused once submitted or out of time.
 
-    Raises Option.DoesNotExist if the option is not one of that question's options in this exam.
+    `marked_for_review` None leaves the flag as it is. Raises Question.DoesNotExist or Option.DoesNotExist
+    for a question outside this exam or an option outside that question.
     """
     if close_if_expired(attempt).submitted_at:
         raise AttemptClosed("This attempt has already been submitted")
-    option = Option.objects.get(pk=option_id, question_id=question_id, question__exams=attempt.exam)
-    Answer.objects.update_or_create(attempt=attempt, question_id=question_id, defaults={"option": option})
+    question = attempt.exam.questions.get(pk=question_id)
+    fields = {"option": None if option_id is None else question.options.get(pk=option_id)}
+    if marked_for_review is not None:
+        fields["marked_for_review"] = marked_for_review
+    Answer.objects.update_or_create(attempt=attempt, question=question, defaults=fields)
 
 
 def visible_exams(student):

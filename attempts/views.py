@@ -10,7 +10,7 @@ from django.utils import timezone
 from django.views.decorators.http import require_GET, require_POST
 
 from identity.access import roles
-from repository.models import Attempt, Exam, Option, Role
+from repository.models import Attempt, Exam, Option, Question, Role
 
 from . import services
 from .services import AttemptClosed, close_if_expired, expires_at, remaining_seconds
@@ -130,9 +130,13 @@ def attempt_paper(request, pk):
             {"attempt": attempt, "timed_out": timed_out},
         )
 
-    saved = dict(attempt.answers.values_list("question_id", "option_id"))
+    saved = {a.question_id: a for a in attempt.answers.all()}
     questions = [
-        {**question, "saved": saved.get(question["id"])}
+        {
+            **question,
+            "saved": getattr(saved.get(question["id"]), "option_id", None),
+            "marked": getattr(saved.get(question["id"]), "marked_for_review", False),
+        }
         for question in paper(attempt)
     ]
     expires_in = math.ceil(
@@ -160,22 +164,25 @@ def attempt_remaining(request, pk):
 @roles(Role.STUDENT)
 @require_POST
 def save_answer(request, pk):
-    """Save each answer as it is selected."""
+    """FR-019: save a response as it is selected. An empty option clears it; marked_for_review is "1" or "0"."""
     attempt = get_object_or_404(Attempt, pk=pk, student=request.user)
     question = request.POST.get("question", "")
     option = request.POST.get("option", "")
+    flag = request.POST.get("marked_for_review")
 
-    if not (question.isdigit() and option.isdigit()):
+    if not question.isdigit() or not (option == "" or option.isdigit()) or flag not in (None, "0", "1"):
         return JsonResponse(
-            {"detail": "A question and an option are required."},
+            {"detail": "A question is required, with an option id or an empty option to clear it."},
             status=400,
         )
 
     try:
-        services.save_answer(attempt, int(question), int(option))
+        services.save_answer(
+            attempt, int(question), int(option) if option else None, None if flag is None else flag == "1"
+        )
     except AttemptClosed as refusal:
         return JsonResponse({"detail": str(refusal)}, status=409)
-    except Option.DoesNotExist:
+    except (Question.DoesNotExist, Option.DoesNotExist):
         return JsonResponse(
             {"detail": "That option does not belong to this question."},
             status=400,
