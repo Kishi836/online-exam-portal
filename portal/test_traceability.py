@@ -8,14 +8,15 @@ from django.test import SimpleTestCase
 from .traceability import MANUAL, TEST_PLAN
 
 ALL_FRS = [f"FR-{n:03d}" for n in range(1, 31)]
-ID = re.compile(r"\b(UT|IT|ST)_(\d{3})\b")
+# Not \b: in "test_UT_001_x" the underscore before UT is a word character, so \b would never match there.
+ID = re.compile(r"(?<![A-Za-z0-9])(UT|IT|ST)_(\d{3})(?!\d)")
 
 
 def automated_ids():
     """Every Test Plan ID that appears in a test method name or docstring anywhere in the repo's test files."""
     found = set()
     for path in Path(settings.BASE_DIR).rglob("test*.py"):
-        if ".venv" in path.parts or "loadtest" in path.parts:
+        if ".venv" in path.parts or "loadtest" in path.parts or path.name == "test_traceability.py":
             continue
         found.update(f"{kind}_{num}" for kind, num in ID.findall(path.read_text(encoding="utf-8")))
     return found
@@ -40,7 +41,7 @@ class TraceabilityTests(SimpleTestCase):
         self.assertEqual(missing, [], "Test Plan cases with no automated test and no manual reason")
 
     def test_no_test_names_an_id_the_test_plan_does_not_have(self):
-        # TODO(Komal): remove this skip once TEST_PLAN is complete; typos like UT_0043 or UT_143 are caught here.
+        # TODO(Komal): remove this skip once TEST_PLAN is complete; a typo'd or made-up ID in a test name is caught here.
         self.skipTest("TODO(Komal): needs the full TEST_PLAN")
         self.assertEqual(sorted(automated_ids() - set(TEST_PLAN)), [])
 

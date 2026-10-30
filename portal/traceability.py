@@ -1,6 +1,7 @@
 """NFR-007: the Requirements Traceability Matrix in code -- every Test Plan case ID and the FRs it verifies.
 
 Source of truth: Documents/Test_Plan.pdf, sections 6.x (one table per use case) and 7 (coverage summary).
+Read the IDs from the PDF itself, row by row: copy-pasting its tables scrambles the columns.
 portal/test_traceability.py checks this table against the test suite, so the RTM can't silently go stale.
 """
 
