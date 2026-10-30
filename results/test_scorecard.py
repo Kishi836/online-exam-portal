@@ -1,4 +1,4 @@
-"""FR-027 -- the Student scorecard with per-question marks (Test Plan UT_062, UT_063, ST_012)."""
+"""FR-027 -- the Student scorecard with per-question marks (Test Plan UT_062, UT_063, IT_034, ST_012)."""
 from decimal import Decimal
 
 from django.test import TestCase
@@ -34,11 +34,17 @@ class ScorecardTests(TestCase):
         # TODO(Kartik): assertEqual(sum(row["marks"] for row in card["rows"]), card["score"])
         self.skipTest("TODO(Kartik): UT_063")
 
-    def test_ST_012_every_scorecard_matches_the_stored_evaluation(self):
+    def test_ST_012_end_to_end_publication_and_scorecard(self):
+        # TODO(Kartik): the Test Plan's ST_012 steps in one test, once Komal's FR-025/026 is on main:
+        # no Student sees a score before publication -> FAC_A POSTs results-publish with publish=1 ->
+        # STU_A's scorecard shows 32.00 / 64.00 / Pass -> publish=0 -> scorecard is 403, stored score unchanged.
+        self.skipTest("TODO(Kartik): ST_012")
+
+    def test_IT_034_every_published_scorecard_matches_the_stored_evaluation(self):
         # TODO(Kartik): five Students (make three more with portal.testkit.make_user + enroll them),
         # each with a different right/wrong mix; for each, the scorecard page shows exactly the stored
         # score, percentage and outcome of their own Attempt row.
-        self.skipTest("TODO(Kartik): ST_012")
+        self.skipTest("TODO(Kartik): IT_034")
 
     def test_unpublished_scorecard_is_403(self):
         Exam.objects.filter(pk=self.world.exam.pk).update(results_published=False)
