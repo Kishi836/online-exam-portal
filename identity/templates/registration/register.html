@@ -22,6 +22,9 @@
       {{ form.roll_number }}
       {{ form.roll_number.errors }}
     </p>
+    {# NFR-008 -- TODO(Kartik): the consent checkbox, BEFORE the submit button, as                              #}
+    {# <p><label>{{ form.consent }} {{ form.consent.label }}</label> {{ form.consent.errors }}</p>             #}
+    {# plus one line: "You can ask the Administrator to erase your personal data at any time."                  #}
     <p>
       <label for="{{ form.password1.id_for_label }}">Password</label>
       {{ form.password1 }}

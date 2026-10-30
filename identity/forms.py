@@ -26,6 +26,11 @@ class RegistrationForm(forms.ModelForm):
         required=True,
         error_messages={"required": "Roll number is required"},
     )
+    # NFR-008 (DPDP Act 2023): registration cannot complete without consent.
+    # TODO(Kartik): a required forms.BooleanField named `consent`, label
+    #   "I consent to my name, email and roll number being used only to run my examinations."
+    # with error_messages={"required": "You must consent to register"}; then in save() below set
+    # user.consent_given_at = timezone.now() (import django.utils.timezone).
 
     class Meta:
         model = User
