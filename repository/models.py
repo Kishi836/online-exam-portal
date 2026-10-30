@@ -180,8 +180,22 @@ class SignInFailure(models.Model):
     at = models.DateTimeField(auto_now_add=True)
 
 
+class AppendOnly(Exception):
+    """FR-030: audit entries are never changed or removed."""
+
+
+class AuditQuerySet(models.QuerySet):
+    """FR-030 / IT_037: bulk changes through the ORM are refused too, not only single rows."""
+
+    # TODO(Komal): override update(self, **kwargs) and delete(self) to raise AppendOnly("The audit log is append-only").
+    pass
+
+
 class AuditEntry(models.Model):
-    """FR-030: who did what to which entity, when, and the values before and after."""
+    """FR-030: who did what to which entity, when, and the values before and after.
+
+    Append-only three times over: save()/delete() below, AuditQuerySet, and SQLite triggers (migration 0006).
+    """
 
     actor = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)  # null = the system itself
     action = models.CharField(max_length=40)
@@ -190,5 +204,11 @@ class AuditEntry(models.Model):
     changes = models.JSONField(default=dict, blank=True)
     at = models.DateTimeField(auto_now_add=True)
 
+    objects = AuditQuerySet.as_manager()
+
     class Meta:
         ordering = ["-at", "-id"]
+
+    # TODO(Komal): override save(self, *args, **kwargs) so it raises AppendOnly when the row already exists
+    # (hint: self._state.adding is True only for a new row), and delete(self, *args, **kwargs) to always raise it.
+    # Do not let your editor reformat the rest of this file -- every teammate's branch touches it.
