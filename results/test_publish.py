@@ -1,5 +1,5 @@
 """FR-025 / FR-026 -- results are withheld until Faculty publishes, and can be unpublished
-(Test Plan UT_059, UT_060, UT_061, IT_033, IT_034)."""
+(Test Plan UT_059, UT_060, UT_061, IT_032, IT_033)."""
 from decimal import Decimal  # noqa: F401  (UT_061)
 
 from django.test import TestCase
@@ -38,19 +38,19 @@ class PublishTests(TestCase):
         # attempt.refresh_from_db() still has score Decimal("32").
         self.skipTest("TODO(Komal): UT_061")
 
-    def test_IT_033_unpublished_result_is_403_through_the_api(self):
+    def test_IT_032_unpublished_result_is_403_through_the_api(self):
         self.as_student()
         response = self.client.get(reverse("result-api", args=[self.attempt.pk]))
         self.assertEqual(response.status_code, 403)
         self.assertNotContains(response, "32", status_code=403)
 
-    def test_IT_034_another_students_result_is_403(self):
+    def test_IT_033_another_students_result_is_403(self):
         other = self.world.submitted(self.world.stu_b, right=5)
         set_results_published(self.world.exam, True)
         self.as_student()
         # TODO(Komal): GET result-api for `other` -> 403 and STU_B's score ("10.00") not in the body.
         # Then GET it for STU_A's own attempt -> 200 and response.json()["score"] == "32.00".
-        self.skipTest("TODO(Komal): IT_034")
+        self.skipTest("TODO(Komal): IT_033")
 
     def test_publishing_before_the_window_closes_is_refused(self):
         # TODO(Komal): make a fresh exam whose window_end is in the future (or None), and assert
