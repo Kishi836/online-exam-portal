@@ -2,6 +2,9 @@
 <html lang="en">
 <head><meta charset="utf-8"><title>{{ attempt.exam.title }}</title></head>
 <body>
+  {# FR-028 -- TODO(Kartik): add data-focus-url="{% url 'attempt-focus-lost' attempt.pk %}" to <body> above and    #}
+  {# <script src="{% static 'attempts/focus.js' %}" defer></script> before </body> ({% load static %} at the top). #}
+  {# If FR-018's question.html is on main by then, wire it there instead -- that becomes the attempt page.       #}
   {% include "_nav.html" %}
   <h1>{{ attempt.exam.title }}</h1>
   <p>Started at {{ attempt.started_at|time:"H:i" }} &middot; {{ attempt.exam.duration_minutes }} minutes</p>
