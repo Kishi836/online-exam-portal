@@ -89,6 +89,12 @@ class EmailLoginForm(forms.Form):
         email = cleaned_data.get("email")
         password = cleaned_data.get("password")
         if email and password:
+            # NFR-012 -- TODO(Komal), using identity.lockout:
+            # 1. BEFORE authenticate(): if lockout.is_locked(email), raise
+            #    ValidationError("Too many failed sign-ins. Try again in 15 minutes.")  -- even if the password is right.
+            # 2. When authenticate() fails (None or inactive): lockout.record_failure(email), then the existing error.
+            # 3. On success: lockout.clear(email).
+            # Keep "Invalid email or password" for every other failure, so unknown and known emails look the same.
             self.user_cache = authenticate(self.request, username=email, password=password)
             if self.user_cache is None:
                 raise ValidationError("Invalid email or password")
