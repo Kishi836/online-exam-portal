@@ -24,6 +24,8 @@ INSTALLED_APPS = [
     "examsetup",
     "attempts",
     "evaluation",
+    "results",
+    "integrity",
 ]
 
 MIDDLEWARE = [
