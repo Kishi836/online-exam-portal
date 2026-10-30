@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{{ attempt.exam.title }} &middot; Scorecard</title></head>
+<body>
+  {% include "_nav.html" %}
+  <h1>{{ attempt.exam.title }} &middot; Scorecard</h1>
+
+  {# FR-027 -- TODO(Kartik): a summary with three figures exactly as stored (no re-rounding, ST_012):  #}
+  {#   Total: {{ card.score }} / {{ card.total_marks }}   Percentage: {{ card.percentage }}%          #}
+  {#   Outcome: Pass or Fail from card.passed                                                        #}
+
+  <table>
+    <caption>Marks on each question</caption>
+    <thead><tr><th scope="col">#</th><th scope="col">Question</th><th scope="col">Your answer</th><th scope="col">Marks</th></tr></thead>
+    <tbody>
+      {# TODO(Kartik): one <tr> per row in card.rows; "Not answered" when row.chosen is None. #}
+    </tbody>
+  </table>
+
+  <p><a href="{% url 'student-dashboard' %}">Back to dashboard</a></p>
+</body>
+</html>
