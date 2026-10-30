@@ -33,8 +33,8 @@ def results_publish(request, exam_id):
 def result_api(request, attempt_id):
     """FR-025: GET /api/results/<attempt_id> -> {"score", "percentage", "passed"} as strings / bool.
 
-    Refused with HTTP 403 -- not 404 -- when the attempt is another Student's (IT_034) or its result
-    is not visible yet (IT_033). A refused body must not contain any score figure.
+    Refused with HTTP 403 -- not 404 -- when the attempt is another Student's (IT_033) or its result
+    is not visible yet (IT_032). A refused body must not contain any score figure.
     """
     # TODO(Komal):
     # 1. attempt = get_object_or_404(Attempt.objects.select_related("exam"), pk=attempt_id)
