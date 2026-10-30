@@ -7,6 +7,7 @@ from django.shortcuts import redirect, render
 
 from identity.access import roles
 from repository.models import Question, Role
+from repository import audit
 
 from .forms import OptionFormSet, QuestionForm
 
@@ -24,6 +25,7 @@ def _save_question(question_form, option_formset, faculty):
         question.save()
         option_formset.instance = question
         option_formset.save()
+        audit.record(faculty, "create", question)
     return question
 
 
@@ -40,7 +42,8 @@ def question_list(request):
 
 @roles(Role.FACULTY)
 def question_create(request):
-    question_form, option_formset = _forms_for_request(request.POST or None, request.user)
+    question_form, option_formset = _forms_for_request(
+        request.POST or None, request.user)
     if request.method == "POST" and question_form.is_valid() and option_formset.is_valid():
         _save_question(question_form, option_formset, request.user)
         messages.success(request, "Question created")
@@ -98,7 +101,8 @@ def question_api(request):
     if not isinstance(payload, dict):
         return JsonResponse({"errors": {"body": ["Invalid JSON"]}}, status=400)
 
-    question_form, option_formset = _forms_for_request(_api_form_data(payload), request.user)
+    question_form, option_formset = _forms_for_request(
+        _api_form_data(payload), request.user)
     if not question_form.is_valid() or not option_formset.is_valid():
         return JsonResponse({"errors": _api_errors(question_form, option_formset)}, status=400)
     question = _save_question(question_form, option_formset, request.user)

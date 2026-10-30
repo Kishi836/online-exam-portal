@@ -11,6 +11,7 @@ from django.views.decorators.http import require_GET, require_POST
 
 from identity.access import roles
 from repository.models import Attempt, Exam, Option, Role
+from repository import audit
 
 from . import services
 from .services import AttemptClosed, close_if_expired, expires_at, remaining_seconds
@@ -39,7 +40,13 @@ def start(exam, student):
         if now >= exam.window_end:
             raise NotEligible("This examination has closed")
 
-    attempt, _ = Attempt.objects.get_or_create(exam=exam, student=student)
+    attempt, created = Attempt.objects.get_or_create(
+        exam=exam,
+        student=student,
+    )
+
+    if created:
+        audit.record(student, "create", attempt)
 
     if close_if_expired(attempt).submitted_at:
         raise NotEligible("You have already submitted this examination")
@@ -159,7 +166,8 @@ def attempt_paper(request, pk):
 
 @roles(Role.STUDENT)
 def attempt_remaining(request, pk):
-    attempt = get_object_or_404(Attempt.objects.select_related("exam"), pk=pk, student=request.user)
+    attempt = get_object_or_404(Attempt.objects.select_related(
+        "exam"), pk=pk, student=request.user)
     attempt = close_if_expired(attempt)
     return JsonResponse({"remaining_seconds": remaining_seconds(attempt)})
 
