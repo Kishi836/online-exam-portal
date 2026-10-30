@@ -1,0 +1,42 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{{ attempt.exam.title }} &middot; Question {{ n }}</title></head>
+<body>
+  {% include "_nav.html" %}
+  <h1>{{ attempt.exam.title }}</h1>
+  {% url 'attempt-remaining' attempt.pk as remaining_url %}
+  {% include "attempts/_timer.html" with remaining=expires_in remaining_url=remaining_url %}
+
+  {# FR-018: the palette. One link per question; its class and its text both carry the state (never colour alone, NFR-009). #}
+  <nav aria-label="Question palette" class="palette">
+    {# TODO(Kartik): for each (number, state) in cells, a link to {% url 'attempt-question' attempt.pk number %}   #}
+    {# with class="cell {{ state }}", aria-current="page" on the current one, and a visually hidden label such as   #}
+    {# "Question 3, Answered" so a screen reader hears the state.                                                   #}
+  </nav>
+
+  <form id="question" data-answers="{% url 'attempt-answer' attempt.pk %}" data-expires-in="{{ expires_in }}">
+    {% csrf_token %}
+    <fieldset>
+      <legend>Question {{ n }} of {{ total }}. {{ question.stem }}</legend>
+      {# TODO(Kartik): one <label><input type="radio" name="option" value="{{ o.id }}" data-question="{{ question.id }}"> {{ o.text }}</label> #}
+      {# per option in question.options, checked when it is the saved option. Never print anything about correctness (FR-029). #}
+    </fieldset>
+  </form>
+
+  {# TODO(Kartik): Previous / Next links (hide Previous on 1, Next on the last). #}
+  {# The "Clear response" and "Mark for review" buttons post to the same attempt-answer endpoint; Kshitij's FR-019 #}
+  {# PR adds the empty-option (clear) and marked_for_review=1 parameters there. Add the buttons once that is on main. #}
+
+  <form method="post" action="{% url 'attempt-submit' attempt.pk %}">
+    {% csrf_token %}
+    <button type="submit">Submit paper</button>
+  </form>
+
+  <script>
+    // Same save-as-you-go as paper.html (FR-020): a choice is posted the moment it is made.
+    // TODO(Kartik): copy the "change" listener and the expiry reload from paper.html, reading from #question.
+    // After a successful save, set the current palette cell to "answered" without a reload; the server's
+    // state is still the source of truth on the next page (IT_021).
+  </script>
+</body>
+</html>
