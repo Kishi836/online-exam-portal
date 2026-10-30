@@ -1,4 +1,3 @@
-
 """Student exam visibility and attempt session management."""
 
 import math
@@ -13,7 +12,13 @@ from identity.access import roles
 from repository.models import Attempt, Exam, Option, Role
 
 from . import services
-from .services import AttemptClosed, close_if_expired, expires_at, remaining_seconds
+from .services import (
+    AttemptClosed,
+    close_if_expired,
+    expires_at,
+    remaining_seconds,
+    result_visible,
+)
 
 
 class NotEligible(Exception):
@@ -131,10 +136,15 @@ def attempt_paper(request, pk):
 
     if attempt.submitted_at:
         timed_out = attempt.submitted_at == expires_at(attempt)
+
         return render(
             request,
             "attempts/submitted.html",
-            {"attempt": attempt, "timed_out": timed_out},
+            {
+                "attempt": attempt,
+                "timed_out": timed_out,
+                "visible": result_visible(attempt),
+            },
         )
 
     saved = dict(attempt.answers.values_list("question_id", "option_id"))
@@ -159,16 +169,27 @@ def attempt_paper(request, pk):
 
 @roles(Role.STUDENT)
 def attempt_remaining(request, pk):
-    attempt = get_object_or_404(Attempt.objects.select_related("exam"), pk=pk, student=request.user)
+    attempt = get_object_or_404(
+        Attempt.objects.select_related("exam"),
+        pk=pk,
+        student=request.user,
+    )
     attempt = close_if_expired(attempt)
-    return JsonResponse({"remaining_seconds": remaining_seconds(attempt)})
+
+    return JsonResponse(
+        {"remaining_seconds": remaining_seconds(attempt)}
+    )
 
 
 @roles(Role.STUDENT)
 @require_POST
 def save_answer(request, pk):
     """Save each answer as it is selected."""
-    attempt = get_object_or_404(Attempt, pk=pk, student=request.user)
+    attempt = get_object_or_404(
+        Attempt,
+        pk=pk,
+        student=request.user,
+    )
     question = request.POST.get("question", "")
     option = request.POST.get("option", "")
 
@@ -181,7 +202,10 @@ def save_answer(request, pk):
     try:
         services.save_answer(attempt, int(question), int(option))
     except AttemptClosed as refusal:
-        return JsonResponse({"detail": str(refusal)}, status=409)
+        return JsonResponse(
+            {"detail": str(refusal)},
+            status=409,
+        )
     except Option.DoesNotExist:
         return JsonResponse(
             {"detail": "That option does not belong to this question."},
@@ -196,7 +220,12 @@ def save_answer(request, pk):
 def submit_attempt(request, pk):
     """Submit an attempt, or leave an already-expired attempt closed."""
     attempt = close_if_expired(
-        get_object_or_404(Attempt, pk=pk, student=request.user)
+        get_object_or_404(
+            Attempt,
+            pk=pk,
+            student=request.user,
+        )
     )
     services.submit(attempt)
+
     return redirect("attempt-paper", attempt.pk)

@@ -7,14 +7,19 @@ class ResultsNotReady(Exception):
 
 
 def set_results_published(exam, published, now=None):
-    """FR-026: publish (True) or unpublish (False) the results of `exam`. Unpublishing never touches a score (UT_061).
+    """Publish or unpublish results without modifying any attempt scores.
 
-    Refuse with ResultsNotReady("Results can be published only after the examination window closes")
-    when publishing an exam with no window, or whose window_end is still in the future (server time).
-    Unpublishing is always allowed.
+    Refuse publication when the examination has no window_end or its
+    window_end is still in the future. Unpublishing is always allowed.
     """
     now = now or timezone.now()
-    # TODO(Komal): the refusal above, then save only the results_published field:
-    #     exam.save(update_fields=["results_published"])
-    # FR-030: once your audit PR is on main, record ("publish_results" / "unpublish_results") here too.
-    raise NotImplementedError
+
+    if published and (
+        exam.window_end is None or exam.window_end > now
+    ):
+        raise ResultsNotReady(
+            "Results can be published only after the examination window closes"
+        )
+
+    exam.results_published = published
+    exam.save(update_fields=["results_published"])
