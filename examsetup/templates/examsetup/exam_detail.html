@@ -58,6 +58,9 @@
     </form>
     {% elif exam.status == "PUBLISHED" %}
     <p><a href="{% url 'exam-schedule' exam.id %}">Schedule Examination</a></p>
+    {# FR-026 -- TODO(Komal): show "Results: Published" or "Results: Not published", then ONE form posting to #}
+    {# {% url 'results-publish' exam.id %} with a hidden input publish=1 (button "Publish results") or       #}
+    {# publish=0 (button "Unpublish results"), depending on exam.results_published. Include csrf_token.      #}
     {% endif %}
 
     <p><a href="{% url 'exam-list' %}">Back to exams</a></p>
