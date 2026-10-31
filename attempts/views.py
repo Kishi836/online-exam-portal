@@ -157,8 +157,10 @@ def attempt_question(request, pk, n):
     states = services.palette(attempt, [q["id"] for q in questions])
     saved = attempt.answers.get(question_id=question["id"])
     expires_in = math.ceil((expires_at(attempt) - timezone.now()).total_seconds())
+    saved_answers = dict(attempt.answers.values_list("question_id", "option_id"))
+    all_questions = [{**q, "saved": saved_answers.get(q["id"])} for q in questions]
     return render(request, "attempts/question.html", {
-        "attempt": attempt, "question": question, "n": n, "total": len(questions),
+        "attempt": attempt, "question": question, "questions": all_questions, "n": n, "total": len(questions),
         "cells": list(enumerate(states, start=1)), "saved": saved.option_id,
         "marked": saved.marked_for_review, "expires_in": expires_in,
     })
