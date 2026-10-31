@@ -9,8 +9,8 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from portal.testkit import World
-from repository.models import FocusEvent
+from portal.testkit import World, make_user
+from repository.models import FocusEvent, Role
 from attempts.services import submit
 
 
@@ -35,6 +35,11 @@ class FocusTests(TestCase):
 
     def test_UT_066_no_loss_means_no_event(self):
         self.client.get(reverse("attempt-paper", args=[self.attempt.pk]))
+        q = self.world.questions[0]
+        self.client.post(
+            reverse("attempt-answer", args=[self.attempt.pk]),
+            {"question": q.pk, "option": self.world.right[0].pk},
+        )
         self.assertFalse(FocusEvent.objects.filter(attempt=self.attempt).exists())
 
     def test_UT_067_client_supplied_time_is_ignored(self):
@@ -57,6 +62,9 @@ class FocusTests(TestCase):
         self.client.force_login(self.world.fac_a)
         response = self.client.get(reverse("exam-integrity", args=[self.world.exam.pk]))
         self.assertContains(response, self.world.stu_a.full_name)
-        self.assertContains(response, "2")
+        self.assertContains(response, "<td>2</td>")
+        other_faculty = make_user(Role.FACULTY, "fac.other@pes.edu")
+        self.client.force_login(other_faculty)
+        self.assertEqual(self.client.get(reverse("exam-integrity", args=[self.world.exam.pk])).status_code, 403)
         self.client.force_login(self.world.stu_a)
         self.assertEqual(self.client.get(reverse("exam-integrity", args=[self.world.exam.pk])).status_code, 403)
