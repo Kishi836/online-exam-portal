@@ -29,9 +29,7 @@ NOT_VISITED, NOT_ANSWERED, ANSWERED, MARKED = "not-visited", "not-answered", "an
 
 def visit(attempt, question_id):
     """FR-018: opening a question records the visit as an Answer row with no option, so it reads Not Answered."""
-    # TODO(Kartik): get_or_create the Answer row for (attempt, question_id). Never overwrite an existing
-    # row: revisiting an answered question must not clear its option or its review flag.
-    raise NotImplementedError
+    Answer.objects.get_or_create(attempt=attempt, question_id=question_id)
 
 
 def palette(attempt, question_ids):
@@ -43,8 +41,17 @@ def palette(attempt, question_ids):
     - row with no option         -> NOT_ANSWERED
     """
     answers = {a.question_id: a for a in attempt.answers.all()}  # one query for the whole paper
-    # TODO(Kartik): return [state for each id in question_ids] using the rules above.
-    raise NotImplementedError
+    def state(question_id):
+        answer = answers.get(question_id)
+        if answer is None:
+            return NOT_VISITED
+        if answer.marked_for_review:
+            return MARKED
+        if answer.option_id is not None:
+            return ANSWERED
+        return NOT_ANSWERED
+
+    return [state(question_id) for question_id in question_ids]
 
 
 def result_visible(attempt):

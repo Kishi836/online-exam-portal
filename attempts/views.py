@@ -137,27 +137,7 @@ def attempt_paper(request, pk):
             {"attempt": attempt, "timed_out": timed_out},
         )
 
-    # FR-018: the paper is delivered one question at a time, starting at question 1.
-    # TODO(Kartik): replace everything below with   return redirect("attempt-question", attempt.pk, 1)
-    # and delete attempts/templates/attempts/paper.html once question.html replaces it (UT_044).
-    saved = dict(attempt.answers.values_list("question_id", "option_id"))
-    questions = [
-        {**question, "saved": saved.get(question["id"])}
-        for question in paper(attempt)
-    ]
-    expires_in = math.ceil(
-        (expires_at(attempt) - timezone.now()).total_seconds()
-    )
-
-    return render(
-        request,
-        "attempts/paper.html",
-        {
-            "attempt": attempt,
-            "questions": questions,
-            "expires_in": expires_in,
-        },
-    )
+    return redirect("attempt-question", attempt.pk, 1)
 
 
 @roles(Role.STUDENT)
@@ -173,15 +153,15 @@ def attempt_question(request, pk, n):
         raise Http404
     question = questions[n - 1]
 
-    # TODO(Kartik):
-    # 1. services.visit(attempt, question["id"]) BEFORE building the palette, so this question
-    #    shows Not Answered rather than Not Visited.
-    # 2. states = services.palette(attempt, [q["id"] for q in questions])
-    # 3. Look up this question's saved Answer (option_id, marked_for_review) so the page shows it.
-    # 4. Render "attempts/question.html" with: attempt, question, n, total=len(questions),
-    #    cells = list of (number, state) pairs for the palette, saved option id, marked flag,
-    #    and expires_in computed exactly as attempt_paper does (server clock only, FR-017).
-    raise NotImplementedError
+    services.visit(attempt, question["id"])
+    states = services.palette(attempt, [q["id"] for q in questions])
+    saved = attempt.answers.get(question_id=question["id"])
+    expires_in = math.ceil((expires_at(attempt) - timezone.now()).total_seconds())
+    return render(request, "attempts/question.html", {
+        "attempt": attempt, "question": question, "n": n, "total": len(questions),
+        "cells": list(enumerate(states, start=1)), "saved": saved.option_id,
+        "marked": saved.marked_for_review, "expires_in": expires_in,
+    })
 
 
 @roles(Role.STUDENT)
