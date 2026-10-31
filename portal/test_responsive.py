@@ -16,7 +16,7 @@ VIEWPORT = '<meta name="viewport" content="width=device-width, initial-scale=1">
 def full_pages():
     """Every template that is a whole HTML document (partials such as _nav.html and _timer.html are skipped)."""
     for path in Path(settings.BASE_DIR).rglob("templates/**/*.html"):
-        if "<html" in path.read_text(encoding="utf-8"):
+        if ".venv" not in path.parts and "<html" in path.read_text(encoding="utf-8"):
             yield path
 
 
