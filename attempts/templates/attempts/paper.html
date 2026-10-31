@@ -3,6 +3,7 @@
 <head><meta charset="utf-8"><title>{{ attempt.exam.title }}</title></head>
 <body>
   {% include "_nav.html" %}
+  <main id="main">
   <h1>{{ attempt.exam.title }}</h1>
   <p>Started at {{ attempt.started_at|time:"H:i" }} &middot; {{ attempt.exam.duration_minutes }} minutes</p>
   {% url 'attempt-remaining' attempt.pk as remaining_url %}
@@ -20,6 +21,7 @@
     {% endfor %}
     <button type="submit">Submit paper</button>
   </form>
+  </main>
   <script>
     // FR-020: every choice is saved as it is made; the server submits at expiry, and this reload shows it.
     // setTimeout counts elapsed time, so changing the PC clock cannot delay the reload (IT_027).

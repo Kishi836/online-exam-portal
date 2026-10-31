@@ -74,8 +74,7 @@ class AccessibilityTests(TestCase):
         # change, which is too faint for WCAG 2.4.7. Drop `outline: none` there so :focus-visible's outline shows.
         self.assertIsNone(re.search(r"outline:\s*none", css), "site.css hides the focus outline somewhere")
 
-    def test_timer_announces_politely_and_palette_states_are_not_colour_only(self):
-        # The timer already has aria-live="polite". The palette state text check belongs with FR-018's
-        # question page: once that is on main, assert each palette link has a text state such as "Answered".
-        # TODO(Kartik): add that assertion after FR-018 merges, against reverse("attempt-question", ...).
-        self.skipTest("TODO(Kartik): after FR-018 is on main")
+    def test_timer_announces_politely(self):
+        response = self.client.get(reverse("attempt-paper", args=[self.attempt.pk]))
+        self.assertContains(response, 'id="timer"')
+        self.assertContains(response, 'aria-live="polite"')
