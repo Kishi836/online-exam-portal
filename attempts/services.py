@@ -5,7 +5,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from evaluation.engine import evaluate
-from repository.models import Answer, Attempt, Option
+from repository.models import Answer, Attempt, Exam
 
 
 class AttemptClosed(Exception):
@@ -82,12 +82,49 @@ def close_if_expired(attempt):
     return attempt
 
 
-def save_answer(attempt, question_id, option_id):
-    """Store the Student's choice for one question; refused once the attempt is submitted or out of time.
+def save_answer(attempt, question_id, option_id, marked_for_review=None):
+    """FR-019: store, change or clear (option_id None) one response; refused once submitted or out of time.
 
-    Raises Option.DoesNotExist if the option is not one of that question's options in this exam.
+    `marked_for_review` None leaves the flag as it is. Raises Question.DoesNotExist or Option.DoesNotExist
+    for a question outside this exam or an option outside that question.
     """
     if close_if_expired(attempt).submitted_at:
         raise AttemptClosed("This attempt has already been submitted")
-    option = Option.objects.get(pk=option_id, question_id=question_id, question__exams=attempt.exam)
-    Answer.objects.update_or_create(attempt=attempt, question_id=question_id, defaults={"option": option})
+    question = attempt.exam.questions.get(pk=question_id)
+    fields = {"option": None if option_id is None else question.options.get(pk=option_id)}
+    if marked_for_review is not None:
+        fields["marked_for_review"] = marked_for_review
+    Answer.objects.update_or_create(attempt=attempt, question=question, defaults=fields)
+
+
+def visible_exams(student):
+    """FR-006: the published exams of the courses this Student is enrolled in. The one place this rule lives."""
+    return Exam.objects.filter(course__students=student, status=Exam.Status.PUBLISHED).select_related("course")
+
+
+def dashboard_groups(student, now=None):
+    """FR-014: the Student's visible exams split into Upcoming, Live and Completed, by server time only.
+
+    - Upcoming: no window yet, or server time is before window_start.
+    - Live: the window is open and the Student has no submitted attempt.
+    - Completed: the Student has submitted, or the window has ended.
+
+    `now` is for tests; the dashboard passes nothing, so the server clock decides (IT_018).
+    """
+    now = now or timezone.now()
+    groups = {"upcoming": [], "live": [], "completed": []}
+    submitted = set(
+        Attempt.objects.filter(student=student, submitted_at__isnull=False).values_list("exam_id", flat=True)
+    )
+    for exam in visible_exams(student).order_by("window_start", "title"):
+        if exam.id in submitted:
+            groups["completed"].append(exam)
+        elif exam.window_start is None or exam.window_end is None:
+            groups["upcoming"].append(exam)
+        elif now < exam.window_start:
+            groups["upcoming"].append(exam)
+        elif now >= exam.window_end:
+            groups["completed"].append(exam)
+        else:
+            groups["live"].append(exam)
+    return groups

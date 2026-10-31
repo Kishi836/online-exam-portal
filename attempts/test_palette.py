@@ -67,3 +67,16 @@ class PaletteTests(TestCase):
         services.save_answer(self.attempt, question.id, option.id)
         response = self.open(2)
         self.assertEqual(response.context["saved"], option.id)
+
+    def test_palette_states_have_accessible_text_labels(self):
+        # Questions 1 to 4 in different states
+        q2 = self.ids[1]
+        services.save_answer(self.attempt, q2, self.world.questions[1].options.first().id)
+        q3 = self.ids[2]
+        Answer.objects.create(attempt=self.attempt, question_id=q3, marked_for_review=True)
+        response = self.open(1)
+        self.assertContains(response, '<span class="visually-hidden">Question 1, Not answered</span>')
+        self.assertContains(response, '<span class="visually-hidden">Question 2, Answered</span>')
+        self.assertContains(response, '<span class="visually-hidden">Question 3, Marked for review</span>')
+        self.assertContains(response, '<span class="visually-hidden">Question 4, Not visited</span>')
+
