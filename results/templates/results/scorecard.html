@@ -5,15 +5,22 @@
   {% include "_nav.html" %}
   <h1>{{ attempt.exam.title }} &middot; Scorecard</h1>
 
-  {# FR-027 -- TODO(Kartik): a summary with three figures exactly as stored (no re-rounding, ST_012):  #}
-  {#   Total: {{ card.score }} / {{ card.total_marks }}   Percentage: {{ card.percentage }}%          #}
-  {#   Outcome: Pass or Fail from card.passed                                                        #}
+  <p>Total: {{ card.score }} / {{ card.total_marks }}</p>
+  <p>Percentage: {{ card.percentage }}%</p>
+  <p>Outcome: {% if card.passed %}Pass{% else %}Fail{% endif %}</p>
 
   <table>
     <caption>Marks on each question</caption>
     <thead><tr><th scope="col">#</th><th scope="col">Question</th><th scope="col">Your answer</th><th scope="col">Marks</th></tr></thead>
     <tbody>
-      {# TODO(Kartik): one <tr> per row in card.rows; "Not answered" when row.chosen is None. #}
+      {% for row in card.rows %}
+        <tr>
+          <td>{{ row.n }}</td>
+          <td>{{ row.stem }}</td>
+          <td>{% if row.chosen %}{{ row.chosen }}{% else %}Not answered{% endif %}</td>
+          <td>{{ row.marks }}</td>
+        </tr>
+      {% endfor %}
     </tbody>
   </table>
 

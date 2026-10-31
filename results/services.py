@@ -1,4 +1,5 @@
 """Results (SAD 3.1): business operations on published results. The visibility rule is attempts.services.result_visible."""
+from decimal import Decimal
 
 
 def scorecard(attempt):
@@ -12,8 +13,22 @@ def scorecard(attempt):
     rows = []
     for n, question in enumerate(attempt.exam.questions.order_by("examquestion__order"), start=1):
         answer = answers.get(question.id)
-        # TODO(Kartik): append the row. `marks` comes from answer.marks (set by the evaluation engine);
-        # a question with no Answer row, or an Answer with no option, is unanswered -> Decimal("0").
-        # Never include Option.is_correct or the correct option's text (FR-029 spirit; the SRS asks only for marks).
-    # TODO(Kartik): return the dict, taking score / percentage / passed straight from `attempt`.
-    raise NotImplementedError
+        if answer is not None and answer.option is not None:
+            chosen = answer.option.text
+            marks = answer.marks if answer.marks is not None else Decimal("0")
+        else:
+            chosen = None
+            marks = Decimal("0")
+        rows.append({
+            "n": n,
+            "stem": question.stem,
+            "chosen": chosen,
+            "marks": marks,
+        })
+    return {
+        "score": attempt.score,
+        "total_marks": attempt.exam.total_marks,
+        "percentage": attempt.percentage,
+        "passed": attempt.passed,
+        "rows": rows,
+    }

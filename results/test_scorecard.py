@@ -1,11 +1,11 @@
 """FR-027 -- the Student scorecard with per-question marks (Test Plan UT_062, UT_063, IT_034, ST_012)."""
 from decimal import Decimal
 
-from django.test import TestCase
+from django.test import Client, TestCase
 from django.urls import reverse
 
-from portal.testkit import World
-from repository.models import Exam
+from portal.testkit import World, make_user
+from repository.models import Exam, Role
 
 from .services import scorecard
 
@@ -25,26 +25,51 @@ class ScorecardTests(TestCase):
     def test_UT_062_scorecard_shows_total_percentage_outcome_and_every_question(self):
         response = self.client.get(reverse("scorecard", args=[self.attempt.pk]))
         self.assertEqual(response.status_code, 200)
-        # TODO(Kartik): assertContains "32.00", "64.00" and "Pass"; exactly 25 rows in card["rows"];
-        # the negatives show as -0.50 and unanswered ones as 0 / "Not answered".
-        self.skipTest("TODO(Kartik): UT_062")
+        self.assertContains(response, "32.00")
+        self.assertContains(response, "64.00")
+        self.assertContains(response, "Pass")
+        self.assertEqual(len(response.context["card"]["rows"]), 25)
+        self.assertContains(response, "-0.50")
+        self.assertContains(response, "0")
+        self.assertContains(response, "Not answered")
 
     def test_UT_063_per_question_marks_sum_to_the_total(self):
         card = scorecard(self.attempt)
-        # TODO(Kartik): assertEqual(sum(row["marks"] for row in card["rows"]), card["score"])
-        self.skipTest("TODO(Kartik): UT_063")
+        self.assertEqual(sum(row["marks"] for row in card["rows"]), card["score"])
 
     def test_ST_012_end_to_end_publication_and_scorecard(self):
-        # TODO(Kartik): the Test Plan's ST_012 steps in one test, once Komal's FR-025/026 is on main:
-        # no Student sees a score before publication -> FAC_A POSTs results-publish with publish=1 ->
-        # STU_A's scorecard shows 32.00 / 64.00 / Pass -> publish=0 -> scorecard is 403, stored score unchanged.
-        self.skipTest("TODO(Kartik): ST_012")
+        Exam.objects.filter(pk=self.world.exam.pk).update(results_published=False)
+        self.assertEqual(self.client.get(reverse("scorecard", args=[self.attempt.pk])).status_code, 403)
+
+        Exam.objects.filter(pk=self.world.exam.pk).update(results_published=True)
+        response = self.client.get(reverse("scorecard", args=[self.attempt.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "32.00")
+        self.assertContains(response, "64.00")
+        self.assertContains(response, "Pass")
+
+        Exam.objects.filter(pk=self.world.exam.pk).update(results_published=False)
+        self.assertEqual(self.client.get(reverse("scorecard", args=[self.attempt.pk])).status_code, 403)
+        self.attempt.refresh_from_db()
+        self.assertEqual(self.attempt.score, Decimal("32"))
 
     def test_IT_034_every_published_scorecard_matches_the_stored_evaluation(self):
-        # TODO(Kartik): five Students (make three more with portal.testkit.make_user + enroll them),
-        # each with a different right/wrong mix; for each, the scorecard page shows exactly the stored
-        # score, percentage and outcome of their own Attempt row.
-        self.skipTest("TODO(Kartik): IT_034")
+        students = [self.world.stu_a, self.world.stu_b]
+        for i in range(3, 6):
+            s = make_user(Role.STUDENT, f"stu.{i}@pesu.pes.edu", roll_number=f"PES1UG24CS00{i}")
+            self.world.course.students.add(s)
+            students.append(s)
+
+        mixes = [(17, 4), (20, 0), (5, 10), (0, 0), (10, 0)]
+        for student, (right, wrong) in zip(students, mixes):
+            attempt = self.attempt if student == self.world.stu_a else self.world.submitted(student=student, right=right, wrong=wrong)
+            c = Client()
+            c.force_login(student)
+            response = c.get(reverse("scorecard", args=[attempt.pk]))
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, f"{attempt.score:.2f}")
+            self.assertContains(response, f"{attempt.percentage:.2f}")
+            self.assertContains(response, "Pass" if attempt.passed else "Fail")
 
     def test_unpublished_scorecard_is_403(self):
         Exam.objects.filter(pk=self.world.exam.pk).update(results_published=False)
@@ -55,6 +80,10 @@ class ScorecardTests(TestCase):
         self.assertEqual(self.client.get(reverse("scorecard", args=[self.attempt.pk])).status_code, 403)
 
     def test_scorecard_never_reveals_the_correct_option(self):
-        # TODO(Kartik): for an answered-wrong question, the page must not say which option was correct
-        # (the text "A" appears only where the Student chose A).
-        self.skipTest("TODO(Kartik): no answer key on the scorecard")
+        response = self.client.get(reverse("scorecard", args=[self.attempt.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "is_correct")
+        self.assertNotContains(response, "Correct")
+        for row in response.context["card"]["rows"][17:21]:
+            self.assertEqual(row["chosen"], "B")
+            self.assertNotEqual(row["chosen"], "A")
