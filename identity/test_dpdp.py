@@ -25,8 +25,9 @@ class ConsentTests(TestCase):
         self.assertFalse(User.objects.filter(email=FORM["email"]).exists())
 
     def test_registration_with_consent_stores_when_it_was_given(self):
-        # TODO(Kartik): POST FORM plus {"consent": "on"} -> redirect to login; the new User has consent_given_at set.
-        self.skipTest("TODO(Kartik): consent stored")
+        response = self.client.post(reverse("register"), {**FORM, "consent": "on"})
+        self.assertRedirects(response, reverse("login"))
+        self.assertIsNotNone(User.objects.get(email=FORM["email"]).consent_given_at)
 
 
 class ErasureTests(TestCase):
@@ -36,9 +37,13 @@ class ErasureTests(TestCase):
 
     def test_erasure_removes_personal_data_and_keeps_the_attempt(self):
         erase_student(self.world.stu_a)
-        # TODO(Kartik): refresh stu_a; full_name/email/roll_number replaced, not usable to sign in
-        # (self.client.login(...) is False), is_active False; Attempt still exists with its score.
-        self.skipTest("TODO(Kartik): anonymise in place")
+        self.world.stu_a.refresh_from_db()
+        self.assertEqual(self.world.stu_a.full_name, "Erased student")
+        self.assertEqual(self.world.stu_a.email, f"erased-{self.world.stu_a.pk}@invalid.local")
+        self.assertIsNone(self.world.stu_a.roll_number)
+        self.assertFalse(self.client.login(email="stu.a@pesu.pes.edu", password="Passw0rd!A"))
+        self.assertFalse(self.world.stu_a.is_active)
+        self.assertTrue(Attempt.objects.filter(pk=self.attempt.pk).exists())
 
     def test_only_students_can_be_erased(self):
         with self.assertRaises(NotAStudent):
@@ -48,8 +53,8 @@ class ErasureTests(TestCase):
         self.client.force_login(self.world.adm_a)
         response = self.client.post(reverse("student-erase", args=[self.world.stu_a.pk]))
         self.assertEqual(response.status_code, 302)
-        # TODO(Kartik): stu_a's email now ends with "@invalid.local".
-        self.skipTest("TODO(Kartik): view")
+        self.world.stu_a.refresh_from_db()
+        self.assertTrue(self.world.stu_a.email.endswith("@invalid.local"))
 
     def test_faculty_and_students_cannot_erase(self):
         for user in (self.world.fac_a, self.world.stu_b):

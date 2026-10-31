@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError, transaction
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_GET, require_POST
 
@@ -147,11 +148,13 @@ def course_roster(request, course_id):
 def student_erase(request, student_id):
     """NFR-008: an Administrator erases a Student's personal data on request (DPDP Act, within 30 days)."""
     student = get_object_or_404(User, pk=student_id, role=Role.STUDENT)  # Faculty / Admin ids -> 404
-    # TODO(Kartik): identity.erasure.erase_student(student); messages.success(request, "Personal data erased.");
-    # redirect back to request.POST.get("next") if it is a safe local path (url_has_allowed_host_and_scheme),
-    # else to "course-list". Add an "Erase personal data" POST button per Student on course_roster.html,
-    # shown to ADMIN only, with a confirm() prompt.
-    raise NotImplementedError
+    from .erasure import erase_student
+    erase_student(student)
+    messages.success(request, "Personal data erased.")
+    next_url = request.POST.get("next")
+    if next_url and url_has_allowed_host_and_scheme(next_url, {request.get_host()}):
+        return redirect(next_url)
+    return redirect("course-list")
 
 
 @roles(Role.FACULTY, Role.ADMIN)

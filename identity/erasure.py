@@ -4,6 +4,7 @@ Erasure anonymises the account in place instead of deleting it: Attempt and Answ
 Student, and the examination record (scores, audit) must survive without saying who sat it.
 """
 from django.db import transaction
+from django.contrib.sessions.models import Session
 
 from repository.models import Role
 
@@ -21,7 +22,13 @@ def erase_student(student):
     if student.role != Role.STUDENT:
         raise NotAStudent("Only Student accounts can be erased")
     with transaction.atomic():
-        # TODO(Kartik): set the fields above, student.set_unusable_password(), student.save().
-        # Also log the Student out everywhere: delete their sessions
-        # (django.contrib.sessions.models.Session rows whose get_decoded().get("_auth_user_id") == str(pk)).
-        raise NotImplementedError
+        student.full_name = "Erased student"
+        student.email = f"erased-{student.pk}@invalid.local"
+        student.roll_number = None
+        student.consent_given_at = None
+        student.set_unusable_password()
+        student.is_active = False
+        student.save()
+        for session in Session.objects.all():
+            if session.get_decoded().get("_auth_user_id") == str(student.pk):
+                session.delete()
