@@ -1,7 +1,7 @@
-<!doctype html>
+{% load static %}<!doctype html>
 <html lang="en">
 <head><meta charset="utf-8"><title>{{ attempt.exam.title }}</title></head>
-<body>
+<body data-focus-url="{% url 'attempt-focus-lost' attempt.pk %}">
   {% include "_nav.html" %}
   <h1>{{ attempt.exam.title }}</h1>
   <p>Started at {{ attempt.started_at|time:"H:i" }} &middot; {{ attempt.exam.duration_minutes }} minutes</p>
@@ -47,5 +47,6 @@
     });
     setTimeout(() => location.reload(), (Number(paper.dataset.expiresIn) + 1) * 1000);
   </script>
+  <script src="{% static 'attempts/focus.js' %}" defer></script>
 </body>
 </html>
