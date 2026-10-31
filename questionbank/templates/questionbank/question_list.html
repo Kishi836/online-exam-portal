@@ -3,6 +3,7 @@
 <head><meta charset="utf-8"><title>Question bank</title></head>
 <body>
   {% include "_nav.html" %}
+  <main id="main">
   <h1>Question bank</h1>
   {% if messages %}{% for message in messages %}<p role="status">{{ message }}</p>{% endfor %}{% endif %}
   <p><a href="{% url 'question-create' %}">Create question</a></p>
@@ -13,5 +14,6 @@
       <li>No questions have been created yet.</li>
     {% endfor %}
   </ul>
+  </main>
 </body>
 </html>

@@ -5,6 +5,7 @@ in the markup. Manual, recorded in the PR description: a Lighthouse accessibilit
 attempt page with no AA violations, and completing EXM_1 using only Tab / Shift+Tab / arrows / Space / Enter.
 """
 import re
+import unittest
 from pathlib import Path
 
 from django.conf import settings
@@ -54,11 +55,19 @@ class AccessibilityTests(TestCase):
         self.assertEqual(failing, [])
 
     def test_every_page_starts_with_a_skip_link_to_main(self):
-        response = self.client.get(reverse("attempt-paper", args=[self.attempt.pk]))
-        # TODO(Kartik): first thing in _nav.html: <a class="skip-link" href="#main">Skip to content</a>
-        # (visually hidden until focused, in site.css), and wrap each page's content in <main id="main">.
-        self.assertContains(response, 'href="#main"')
-        self.assertContains(response, 'id="main"')
+        # _nav.html puts href="#main" on every page; every full-page template must also carry id="main".
+        pages = [
+            reverse("attempt-paper", args=[self.attempt.pk]),
+            reverse("student-exam-list"),
+            reverse("student-exam-detail", args=[self.world.exam.pk]),
+            reverse("login"),
+            reverse("register"),
+        ]
+        for url in pages:
+            with self.subTest(url=url):
+                response = self.client.get(url)
+                self.assertContains(response, 'href="#main"', msg_prefix=f"{url}: skip link missing")
+                self.assertContains(response, 'id="main"', msg_prefix=f"{url}: <main id=\"main\"> missing")
 
     def test_every_option_has_a_label(self):
         html = self.client.get(reverse("attempt-paper", args=[self.attempt.pk])).content.decode()
@@ -78,3 +87,17 @@ class AccessibilityTests(TestCase):
         response = self.client.get(reverse("attempt-paper", args=[self.attempt.pk]))
         self.assertContains(response, 'id="timer"')
         self.assertContains(response, 'aria-live="polite"')
+
+    @unittest.skip(
+        "TODO(Kartik): blocked on FR-018 (#97). Once question.html is on main, assert that each palette "
+        "link carries its state as visible text (Not visited / Not answered / Answered / Marked for review) "
+        "so state is never conveyed by colour alone (NFR-009 / WCAG 1.4.1)."
+    )
+    def test_timer_announces_politely_and_palette_states_are_not_colour_only(self):
+        """Palette links must expose their state as text, not only via CSS class colour."""
+        response = self.client.get(reverse("attempt-paper", args=[self.attempt.pk]))
+        html = response.content.decode()
+        # Each palette cell should carry one of the human-readable state labels.
+        state_labels = ["Not visited", "Not answered", "Answered", "Marked for review"]
+        for label in state_labels:
+            self.assertIn(label, html, f"Palette state '{label}' is missing — colour alone is not enough.")

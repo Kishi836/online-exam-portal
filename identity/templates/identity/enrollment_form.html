@@ -6,6 +6,7 @@
   </head>
   <body>
     {% include "_nav.html" %}
+  <main id="main">
     <h1>Enroll Student</h1>
     <p>Course: {{ course.code }} — {{ course.title }}</p>
 
@@ -23,5 +24,6 @@
     <p>
       <a href="{% url 'course-roster' course.id %}">Back to roster</a>
     </p>
-  </body>
+    </main>
+</body>
 </html>

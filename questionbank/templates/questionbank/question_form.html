@@ -3,6 +3,7 @@
 <head><meta charset="utf-8"><title>Create question</title></head>
 <body>
   {% include "_nav.html" %}
+  <main id="main">
   <h1>Create a multiple-choice question</h1>
   <form method="post">
     {% csrf_token %}
@@ -32,5 +33,6 @@
     <button type="submit">Create question</button>
   </form>
   <p><a href="{% url 'question-list' %}">Back to question bank</a></p>
+  </main>
 </body>
 </html>

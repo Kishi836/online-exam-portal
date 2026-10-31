@@ -6,6 +6,7 @@
   </head>
   <body>
     {% include "_nav.html" %}
+  <main id="main">
     <h1>My Exams</h1>
 
     <p><a href="{% url 'exam-create' %}">Create New Exam</a></p>
@@ -22,5 +23,6 @@
     {% else %}
     <p>No exams created yet.</p>
     {% endif %}
-  </body>
+    </main>
+</body>
 </html>

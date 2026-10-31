@@ -7,6 +7,7 @@
   </head>
   <body>
     {% include "_nav.html" %}
+  <main id="main">
     <h1>Welcome, {{ user.full_name|default:user.email }}</h1>
     <p class="muted">Signed in as {{ user.email }} ({{ user.get_role_display }}).</p>
 
@@ -64,5 +65,6 @@
       </a>
       {% endif %}
     </div>
-  </body>
+    </main>
+</body>
 </html>

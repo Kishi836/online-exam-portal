@@ -6,6 +6,7 @@
   </head>
   <body>
     {% include "_nav.html" %}
+    <main id="main">
     <h1>{{ exam.title }}</h1>
 
     <p>
@@ -23,5 +24,6 @@
     </form>
 
     <p><a href="{% url 'student-exam-list' %}">Back to available exams</a></p>
+    </main>
   </body>
 </html>
