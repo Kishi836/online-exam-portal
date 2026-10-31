@@ -15,11 +15,12 @@ from . import services  # noqa: F401
 @require_POST
 def focus_lost(request, pk):
     """FR-028: POST /api/attempts/<pk>/focus-lost from the attempt page. No body is read. 204 on success."""
-    # TODO(Kartik):
-    # 1. attempt = get_object_or_404(Attempt, pk=pk, student=request.user)   (another Student's -> 404)
-    # 2. services.record_focus_loss(attempt); on AttemptClosed return JsonResponse({"detail": ...}, status=409)
-    # 3. return HttpResponse(status=204)
-    raise NotImplementedError
+    attempt = get_object_or_404(Attempt, pk=pk, student=request.user)
+    try:
+        services.record_focus_loss(attempt)
+    except AttemptClosed as error:
+        return JsonResponse({"detail": str(error)}, status=409)
+    return HttpResponse(status=204)
 
 
 @roles(Role.FACULTY)
@@ -27,6 +28,4 @@ def focus_lost(request, pk):
 def exam_integrity(request, exam_id):
     """FR-028: the course's Faculty sees every attempt's focus-loss count and server timestamps. A human decides."""
     exam = _faculty_exam_or_403(request, exam_id)
-    # TODO(Kartik): render "integrity/exam_integrity.html" with exam and services.events_by_attempt(exam),
-    # and add a link to this page from examsetup/templates/examsetup/exam_detail.html for published exams.
-    raise NotImplementedError
+    return render(request, "integrity/exam_integrity.html", {"exam": exam, "attempt_events": services.events_by_attempt(exam)})

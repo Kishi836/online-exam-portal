@@ -11,6 +11,7 @@ from django.utils import timezone
 
 from portal.testkit import World
 from repository.models import FocusEvent
+from attempts.services import submit
 
 
 class FocusTests(TestCase):
@@ -23,27 +24,28 @@ class FocusTests(TestCase):
     def test_UT_064_one_focus_loss_is_one_event_with_a_server_time(self):
         response = self.client.post(self.url)
         self.assertEqual(response.status_code, 204)
-        # TODO(Kartik): exactly one FocusEvent for self.attempt, occurred_at within a few seconds of timezone.now().
-        self.skipTest("TODO(Kartik): UT_064")
+        event = FocusEvent.objects.get(attempt=self.attempt)
+        self.assertLess(abs((timezone.now() - event.occurred_at).total_seconds()), 5)
 
     def test_UT_065_three_losses_are_three_events(self):
-        # TODO(Kartik): POST three times; three events, each with its own occurred_at (non-decreasing).
-        self.skipTest("TODO(Kartik): UT_065")
+        for _ in range(3): self.client.post(self.url)
+        events = list(FocusEvent.objects.filter(attempt=self.attempt).order_by("occurred_at"))
+        self.assertEqual(len(events), 3)
+        self.assertEqual(events, sorted(events, key=lambda event: event.occurred_at))
 
     def test_UT_066_no_loss_means_no_event(self):
-        # TODO(Kartik): open the attempt page and save an answer (attempt-answer), never POST focus-lost;
-        # the event log for the attempt is empty.
-        self.skipTest("TODO(Kartik): UT_066")
+        self.client.get(reverse("attempt-paper", args=[self.attempt.pk]))
+        self.assertFalse(FocusEvent.objects.filter(attempt=self.attempt).exists())
 
     def test_UT_067_client_supplied_time_is_ignored(self):
         fake = (timezone.now() + timedelta(hours=1)).isoformat()
-        # TODO(Kartik): POST with data {"occurred_at": fake, "at": fake} and HTTP_DATE=fake;
-        # the stored time is still within seconds of the real server now, not an hour ahead.
-        self.skipTest("TODO(Kartik): UT_067")
+        self.client.post(self.url, {"occurred_at": fake, "at": fake}, HTTP_DATE=fake)
+        self.assertLess(abs((timezone.now() - FocusEvent.objects.get().occurred_at).total_seconds()), 5)
 
     def test_submitted_attempt_refuses_new_events(self):
-        # TODO(Kartik): submit the attempt (attempts.services.submit), POST -> 409, no event stored.
-        self.skipTest("TODO(Kartik): closed attempt")
+        submit(self.attempt)
+        self.assertEqual(self.client.post(self.url).status_code, 409)
+        self.assertFalse(FocusEvent.objects.exists())
 
     def test_another_students_attempt_is_404(self):
         self.client.force_login(self.world.stu_b)
@@ -51,6 +53,10 @@ class FocusTests(TestCase):
         self.assertFalse(FocusEvent.objects.exists())
 
     def test_faculty_integrity_page_lists_each_attempts_events(self):
-        # TODO(Kartik): two events on STU_A's attempt; as FAC_A GET exam-integrity -> 200, shows STU_A
-        # with "2". A Faculty not on the course -> 403. A Student -> 403.
-        self.skipTest("TODO(Kartik): Faculty integrity page")
+        self.client.post(self.url); self.client.post(self.url)
+        self.client.force_login(self.world.fac_a)
+        response = self.client.get(reverse("exam-integrity", args=[self.world.exam.pk]))
+        self.assertContains(response, self.world.stu_a.full_name)
+        self.assertContains(response, "2")
+        self.client.force_login(self.world.stu_a)
+        self.assertEqual(self.client.get(reverse("exam-integrity", args=[self.world.exam.pk])).status_code, 403)

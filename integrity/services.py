@@ -12,12 +12,10 @@ def record_focus_loss(attempt):
     attempt = close_if_expired(attempt)
     if attempt.submitted_at:
         raise AttemptClosed("This attempt has already been submitted")
-    # TODO(Kartik): create and return the FocusEvent for this attempt.
-    raise NotImplementedError
+    return FocusEvent.objects.create(attempt=attempt)
 
 
 def events_by_attempt(exam):
     """FR-028: for the Faculty integrity page -- [(attempt, [events...]), ...] for every attempt on `exam`."""
-    # TODO(Kartik): exam.attempts.select_related("student").prefetch_related("focus_events"), ordered by
-    # the Student's name; return the pairs so the template can show a count and every server timestamp.
-    raise NotImplementedError
+    attempts = exam.attempts.select_related("student").prefetch_related("focus_events").order_by("student__full_name")
+    return [(attempt, list(attempt.focus_events.all())) for attempt in attempts]
